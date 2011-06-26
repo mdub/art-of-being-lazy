@@ -1,0 +1,42 @@
+!!!
+%html{:lang => "en"}
+  %head
+    %meta{:charset => "utf-8"}/
+    %link{:href => href("styles.css"), :rel => "stylesheet"}/
+    %title= page.title
+    :css
+
+      #deck h1 { font-family: 'Skia', Arial; font-size:50px;  }
+      #deck h2 { font-family: 'Skia', Arial; font-size: 30px; }
+    
+  %body
+    %header
+      %h1= page.title
+      %nav
+        %ul
+          %li
+            %button#prev-btn{:title => "Previous slide"} Previous Slide
+          %li
+            %span#slide-number>
+            \/
+            %span#slide-total
+          %li
+            %button#next-btn{:title => "Next Slide"} Next Slide
+
+    #deck
+
+      ~ yield
+      
+    %script{:src => href("jquery-1.5.2.min.js")}
+    %script{:src => href("jquery.jswipe-0.1.2.js")}
+    %script{:src => href("htmlSlides.js")}
+    :javascript
+
+      //Do our business when the DOM is ready for us
+      $(function() {
+
+        // One little option: hideToolbar (boolean; default = false)
+        htmlSlides.init({ hideToolbar: true });
+
+      });
+  
