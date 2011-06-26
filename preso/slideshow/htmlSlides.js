@@ -75,20 +75,6 @@ var htmlSlides = {
       this.focus();
     });
     
-    //Swipe gestures
-    $('.slide').swipe({
-      threshold: {
-        x: 20,
-        y: 30
-      },
-      swipeLeft: function() {
-        base.showActions.apply(base);
-      },
-      swipeRight: function() {
-        base.prevSlide.apply(base);
-      },
-    });    
-
   },    
   
   //Change slide
