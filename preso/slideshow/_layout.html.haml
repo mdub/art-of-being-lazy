@@ -4,10 +4,7 @@
     %meta{:charset => "utf-8"}/
     %link{:href => href("styles.css"), :rel => "stylesheet"}/
     %title= page.title
-    :css
-
-      #deck h1 { font-family: 'Skia', Arial; font-size:50px;  }
-      #deck h2 { font-family: 'Skia', Arial; font-size: 30px; }
+    ~ content_for[:head]
     
   %body
     %header

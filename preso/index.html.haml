@@ -3,6 +3,11 @@ layout: slideshow/_layout.html.haml
 title: Sample presentation
 ...
 
+- content_for[:head] = capture_haml do
+  :css
+    #deck h1 { font-family: 'Skia', Arial; font-size:50px;  }
+    #deck h2 { font-family: 'Skia', Arial; font-size: 30px; }
+
 / Begin slides
 %section
   %hgroup
