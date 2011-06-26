@@ -9,20 +9,20 @@
     
   %body
 
-    %header
-      %h1= page.title
-      %nav
-        %ul
-          %li
-            %button#prev-btn{:title => "Previous slide"} Previous Slide
-          %li
-            %span#slide-number>
-            \/
-            %span#slide-total
-          %li
-            %button#next-btn{:title => "Next Slide"} Next Slide
-
     %article.slideshow
+
+      %header
+        %h1= page.title
+        %nav
+          %ul
+            %li
+              %button#prev-btn{:title => "Previous slide"} Previous Slide
+            %li
+              %span#slide-number>
+              \/
+              %span#slide-total
+            %li
+              %button#next-btn{:title => "Next Slide"} Next Slide
 
       ~ yield
       
