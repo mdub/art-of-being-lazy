@@ -25,14 +25,14 @@ var htmlSlides = {
     
     base = this;
 
-    this.deck = $('#deck');
-    this.slideCount = $('#deck > section').size();
+    this.deck = $('article.slideshow');
+    this.slideCount = $('article.slideshow > section').size();
     this.prevButton = $('#prev-btn');
     this.nextButton = $('#next-btn');
     this.slideNumber = $('#slide-number');
         
     //Add ids and classes to slides
-    $('#deck > section').each(function(index, el) {
+    $('article.slideshow > section').each(function(index, el) {
       $el = $(el);
       $el.attr('id', 'slide' + (index +1));
       $el.addClass('slide');     
