@@ -12,36 +12,3 @@ title: Enumerable, and the art of being lazy
   %ul
     %li my favourite Ruby module
     
-%section
-  %hgroup
-    %h1 Intraslide animation
-    %h2 I'm calling these "actions"
-  %p You can hide/reveal content within the slides by giving something a class of "action". Actions are revealed in the order in which they occur in the HTML. Advancing to the next slide will first reveal actions on the page if they exist.
-  %pre
-    :preserve
-    
-      &lt;p class=&quot;action&quot;&gt;This will be hidden when the slide loads&lt;/p&gt;
-  %ul
-    %li.action Bullet point
-    %li.action Another bullet point
-    %li.action Yet another bullet point
-    %li.action You get the idea
-
-%section
-
-  %hgroup
-    %h1 Custom events
-    %h2 These may or may not be useful for you
-
-  %p When a new slide is loaded, a "newSlide" event is fired. (Take a look at your console.)
-  %p There's also an event triggered when a new "action" is revealed.
-  %pre
-    :preserve
-    
-      //Example usage
-      $(&#x27;html&#x27;).bind(&#x27;newSlide&#x27;, function(e,id) { console.log(id) });
-
-%section
-  %hgroup
-    %h1 Building slides
-    %h2 It's easy
