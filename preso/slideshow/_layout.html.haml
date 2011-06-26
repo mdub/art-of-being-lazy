@@ -2,11 +2,13 @@
 %html{:lang => "en"}
   %head
     %meta{:charset => "utf-8"}/
+    %link{:href => href("normalize.css"), :rel => "stylesheet"}/
     %link{:href => href("styles.css"), :rel => "stylesheet"}/
     %title= page.title
     ~ content_for[:head]
     
   %body
+
     %header
       %h1= page.title
       %nav

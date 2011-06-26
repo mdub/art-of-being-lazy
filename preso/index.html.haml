@@ -1,20 +1,18 @@
 ---
 layout: slideshow/_layout.html.haml
-title: Sample presentation
+title: Enumerable, and the art of being lazy
 ...
 
 - content_for[:head] = capture_haml do
-  :css
-    #deck h1 { font-family: 'Skia', Arial; font-size:50px;  }
-    #deck h2 { font-family: 'Skia', Arial; font-size: 30px; }
+  %link{:href => href("custom-styles.css"), :rel => "stylesheet"}/
 
-/ Begin slides
 %section
   %hgroup
-    %h1 Hello, interwebs explorer.
+    %h1 
     %h2 How to use this thing
   %p Press the right arrow, down arrow, or spacebar to advance; press the left arrow or up arrow to move backward.
   %p You can also click the left and right arrows in the control bar at the top.
+
 %section
   %hgroup
     %h1 Intraslide animation
