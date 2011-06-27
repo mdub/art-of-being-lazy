@@ -6,9 +6,91 @@ title: Enumerable, and the art of being lazy
 - content_for[:head] = capture_haml do
   %link{:href => href("custom-styles.css"), :rel => "stylesheet"}/
 
-%section
-  %h1 Enumerable
+%section.title
 
-  %ul
-    %li my favourite Ruby module
+  %h1 Enumerable, and the art of being lazy
+
+  %p Mike Williams, June 2011
+  
+%section
+
+  %h1 a simple Enumerable
+
+  %pre
+    :preserve
     
+      class SomeNumbers
+  
+        # declare one method
+        
+        def <b>each</b>
+          yield 0
+          yield 1
+          yield 1
+          yield 2
+          yield 3
+          yield 5
+          yield 8
+        end
+
+        # mix in a bunch more
+        
+        include <b>Enumerable</b>
+        
+      end
+
+%section
+
+  %h1 free stuff!
+
+  %pre
+    :preserve
+
+      numbers = SomeNumbers.new
+
+      numbers.to_a              # => [0, 1, 1, 2, 3, 5, 8]
+
+      numbers.take(5)           # => [0, 1, 1, 2, 3]
+      numbers.drop(5)           # => [5, 8]
+
+      numbers.max               # => 8
+
+      numbers.collect do |x| 
+        x * 2
+      end                       # => [0, 2, 2, 4, 6, 10, 16]
+
+      numbers.inject(&:+)       # => 20
+
+%section
+
+  %h1 an infinite Enumerable
+
+  %pre
+    :preserve
+    
+      class FibonacciSequence
+  
+        def <b>each</b>
+          a = 0
+          b = 1
+          loop do
+            yield a
+            a, b = b, a+b
+          end
+        end
+
+        include <b>Enumerable</b>
+        
+      end
+
+%section
+
+  %h1 infinite problems
+
+  %pre
+    :preserve
+      
+      fib.take(5)             # => [0, 1, 1, 2, 3]
+
+      fib.drop(5)             # => a long wait
+      fib.map(5)             # => a long wait

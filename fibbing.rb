@@ -1,3 +1,7 @@
+$: << "lib"
+
 require 'laziness/fibonacci_sequence'
 
-1 + 2
+fib = FibonacciSequence.new
+
+puts fib.take(5)

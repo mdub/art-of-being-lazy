@@ -1,8 +1,16 @@
-  h1 { font-family: 'Skia', Arial; font-size: 50px;  }
-  h2 { font-family: 'Skia', Arial; font-size: 30px; }
+body {
+  font-family: 'Skia', Arial;
+}
 
-.slide {
-  
-  hgroup { margin: 0 0; }
-  
+h1, h2, h3 {
+  font-family: 'Skia', Arial, sans-serif; 
+}
+h1 { font-size: 55px; }
+h2 { font-size: 35px; }
+
+pre {
+  border: 1px solid #ccc;
+  background: #f6f6f0;
+  padding: 1em;
+  overflow: auto;
 }
