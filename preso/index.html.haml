@@ -41,7 +41,7 @@ title: Enumerable, and the art of being lazy
 
 %section
 
-  %h1 free stuff!
+  %h1 woohoo free stuff!
 
   %pre
     :preserve
@@ -61,6 +61,42 @@ title: Enumerable, and the art of being lazy
 
       numbers.inject(&:+)       # => 20
 
+%section
+
+  %h1 cf. Unix pipes
+
+  %table.center
+    %tr
+      %th Enumerable
+      %th Unix command
+    %tr
+      %td
+        %code select, reject, grep
+      %td
+        %code grep, grep -v
+    %tr
+      %td
+        %code collect (map)
+      %td
+        %code sed, awk, tr
+    %tr
+      %td
+        %code sort, uniq
+      %td
+        %code sort, uniq
+    %tr
+      %td
+        %code take, drop
+      %td
+        %code head, tail
+
+  %pre
+    :preserve
+
+      cat messages.log | awk '{print $1}' | sort -u | wc -l
+
+      messages.map { |line| line.split[0] }.uniq.size
+    
 %section
 
   %h1 an infinite Enumerable
@@ -83,6 +119,18 @@ title: Enumerable, and the art of being lazy
         
       end
 
+      irb> FibonacciSequence.new.each { |n| puts n }
+      0
+      1
+      1
+      2
+      3
+      5
+      8
+      13
+      21
+      ...
+
 %section
 
   %h1 infinite problems
@@ -90,7 +138,66 @@ title: Enumerable, and the art of being lazy
   %pre
     :preserve
       
-      fib.take(5)             # => [0, 1, 1, 2, 3]
+      fib = FibonacciSequence.new
+      
+      fib.take(5)               # => [0, 1, 1, 2, 3]
 
-      fib.drop(5)             # => a long wait
-      fib.map(5)             # => a long wait
+      fib.drop(5)               # ... a long wait
+
+      fib.select(&:even?)       # ...
+
+      fib.collect do |x| 
+        x * 2
+      end                       # ...
+
+  %p Enumerable operations return Array (mostly) and are NOT streamable
+
+%section
+
+  %h1 big problems
+
+  %pre
+    :preserve
+
+      # an ActiveRecord example
+      scope = Events.where("happened_at < ?", Time.now)
+      firehose = scope.to_enum(:find_each)
+
+%section
+
+  %h1 Streaming?
+
+  %p Some operations have to read <u>all</u> the input before producing output, e.g.
+
+  %ul
+    %li
+      %code min
+    %li
+      %code max
+    %li
+      %code sort
+    %li
+      %code inject
+
+  %p But some <u>could</u> start early, e.g.
+
+  %ul
+    %li
+      %code select
+    %li
+      %code reject
+    %li
+      %code collect
+    %li
+      %code uniq
+
+%section
+
+  %h1 streamable Enumerable operations
+
+  %pre
+    :preserve
+
+      fib.select(&:even?).take(5)     # ... never returns
+
+      fib.selecting(&:even?).take(5)  # => [0, 2, 8, 34, 144]
