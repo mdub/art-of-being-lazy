@@ -249,10 +249,13 @@ title: Enumerable, and the art of being lazy
       # unrolled
       
       result = []
+      
       fib.each do |n|
         result << n if n.even?
         break if result.size == 5
       end
+      
+      result                        # => [0, 2, 8, 34, 144]
 
 %section
 
@@ -267,11 +270,11 @@ title: Enumerable, and the art of being lazy
       
       # functional
       
-      take(5, select(fib, &:even?))
+      take(select(fib, &:even?), 5)
 
       # decorative
       
-      Taker.new(5, Selector.new(fib, &:even?))
+      Taker.new(Selector.new(fib, &:even?), 5)
     
 %section
 
