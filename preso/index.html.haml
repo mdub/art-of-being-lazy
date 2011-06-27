@@ -71,12 +71,12 @@ title: Enumerable, and the art of being lazy
       %th Unix command
     %tr
       %td
-        %code select, reject, grep
+        %code select/find_all, reject, grep
       %td
         %code grep, grep -v
     %tr
       %td
-        %code collect (map)
+        %code collect/map
       %td
         %code sed, awk, tr
     %tr
@@ -95,8 +95,93 @@ title: Enumerable, and the art of being lazy
 
       cat messages.log | awk '{print $1}' | sort -u | wc -l
 
-      messages.map { |line| line.split[0] }.uniq.size
+      messages.collect { |line| line.split[0] }.uniq.size
+
+%section
+
+  %h1 Nice properties
+  
+  %ul.big
+
+    %li Small, simple operations
+
+    %li Pre-tested
+
+    %li Composable
+
+%section
+
+  %h1 Observation
+
+  %p Some operations have to read <u>all</u> the input before producing output, e.g.
+
+  %ul
+    %li
+      %code min
+    %li
+      %code max
+    %li
+      %code sort
+    %li
+      %code inject
+
+  %p Some <u>could</u> start early, e.g.
+
+  %ul
+    %li
+      %code select
+    %li
+      %code reject
+    %li
+      %code collect
+    %li
+      %code uniq
+
+  %p (but they don't)
+  
+%section
+
+  %h1 "big" problems
+
+  %pre
+    :preserve
+
+      # an ActiveRecord example
+      scope = Events.where("happened_at < ?", 1.week.ago)
+      event_stream = scope.to_enum(:find_each)
     
+      active_sources_last_week = event_stream   \
+        .collect { |e| e.actor.name }           \
+        .uniq                                   \
+        .take(20)                         
+      
+%section
+
+  %h1 Solution: unroll the loops
+
+  %pre
+    :preserve
+
+      # BEFORE
+      
+      active_sources_last_week = event_stream   \
+        .collect { |e| e.actor.name }           \
+        .uniq                                   \
+        .take(20)                         
+
+      # AFTER
+
+      active_sources_last_week = []
+      event_stream.each do |e|
+        name = e.actor.name
+        unless active_sources_last_week.member?(name)
+          active_sources_last_week << name
+        end
+        break if active_sources_last_week.size == 20
+      end
+
+  %p Blah.
+  
 %section
 
   %h1 an infinite Enumerable
@@ -133,7 +218,7 @@ title: Enumerable, and the art of being lazy
 
 %section
 
-  %h1 infinite problems
+  %h1 "infinite" problems
 
   %pre
     :preserve
@@ -150,54 +235,85 @@ title: Enumerable, and the art of being lazy
         x * 2
       end                       # ...
 
-  %p Enumerable operations return Array (mostly) and are NOT streamable
-
 %section
 
-  %h1 big problems
+  %h1 case in point
 
   %pre
     :preserve
 
-      # an ActiveRecord example
-      scope = Events.where("happened_at < ?", Time.now)
-      firehose = scope.to_enum(:find_each)
+      # get the first five <u>even</u> Fibonacci numbers
+
+      fib.select(&:even?).take(5)   # ... never returns
+
+      # unrolled
+      
+      result = []
+      fib.each do |n|
+        result << n if n.even?
+        break if result.size == 5
+      end
 
 %section
 
-  %h1 Streaming?
-
-  %p Some operations have to read <u>all</u> the input before producing output, e.g.
-
-  %ul
-    %li
-      %code min
-    %li
-      %code max
-    %li
-      %code sort
-    %li
-      %code inject
-
-  %p But some <u>could</u> start early, e.g.
-
-  %ul
-    %li
-      %code select
-    %li
-      %code reject
-    %li
-      %code collect
-    %li
-      %code uniq
-
-%section
-
-  %h1 streamable Enumerable operations
+  %h1 More functional
 
   %pre
     :preserve
 
-      fib.select(&:even?).take(5)     # ... never returns
+      # original
+      
+      fib.select(&:even?).take(5)
+      
+      # functional
+      
+      take(5, select(fib, &:even?))
 
-      fib.selecting(&:even?).take(5)  # => [0, 2, 8, 34, 144]
+      # decorative
+      
+      Taker.new(5, Selector.new(fib, &:even?))
+    
+%section
+
+  %h1 Decorative Enumerables
+
+  %pre
+    :preserve
+
+      class <b>Selector</b>
+  
+        def initialize(source, &predicate)
+          @source = source
+          @predicate = predicate
+        end
+  
+        def <b>each</b>
+          @source.each do |value|
+            yield value if @predicate.call(value)
+          end
+        end
+  
+        include Enumerable
+  
+      end
+
+%section
+
+  %h1 Sugared decorations
+
+  %pre
+    :preserve
+
+      module Enumerable
+  
+        def <b>selecting</b>(&predicate)
+          Selector.new(self, &predicate)
+        end
+  
+      end
+
+      # fib.<strike>select</strike>(&:even?).take(5)
+      
+      fib.<b>selecting</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]
+
+      # ta-dah!
