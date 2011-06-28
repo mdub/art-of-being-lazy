@@ -101,7 +101,7 @@ title: Enumerable, and the art of being lazy
 
   %h1 some nice properties
   
-  %ul.big
+  %ul.big.sparse
 
     %li Small, simple operations
 
@@ -138,50 +138,6 @@ title: Enumerable, and the art of being lazy
       %code uniq
 
   %p (but they don't)
-  
-%section
-
-  %h1 "big" problems
-
-  %pre
-    :preserve
-
-      # an ActiveRecord example
-      scope = Events.where("happened_at < ?", 1.week.ago)
-      event_stream = scope.to_enum(:find_each)
-    
-      active_sources_last_week = event_stream   \
-        .collect { |e| e.actor.name }           \
-        .uniq                                   \
-        .take(20)                         
-      
-%section
-
-  %h1 solution: unroll the loops
-
-  %pre
-    :preserve
-
-      # BEFORE
-      
-      active_sources_last_week = event_stream   \
-        .collect { |e| e.actor.name }           \
-        .uniq                                   \
-        .take(20)                         
-
-      # AFTER
-
-      active_sources_last_week = []
-      event_stream.each do |e|
-        name = e.actor.name
-        unless active_sources_last_week.member?(name)
-          active_sources_last_week << name
-        end
-        break if active_sources_last_week.size == 20
-      end
-
-  %p Blah.
-  
 %section
 
   %h1 an infinite Enumerable
@@ -234,7 +190,58 @@ title: Enumerable, and the art of being lazy
       fib.collect do |x| 
         x * 2
       end                       # ... S.O.L.
+  
+%section
 
+  %h1 "big" problems
+
+  %pre
+    :preserve
+
+      # an ActiveRecord example
+
+      scope = Events.where("happened_at < ?", 1.week.ago)
+
+      event_stream = scope.<b>to_enum</b>(:find_each)
+    
+      active_sources_last_week = event_stream   \
+        .collect { |e| e.actor.name }           \
+        .uniq                                   \
+        .take(20)                         
+      
+  %p Problems:
+  
+  %ul.sparse
+    %li generates (using collect, and uniq) a bunch of objects that are never used
+    %li might require a lot of memory for temporary storage
+  
+%section
+
+  %h1 solution: unroll the loops
+
+  %pre
+    :preserve
+
+      # BEFORE
+      
+      active_sources_last_week = event_stream   \
+        .collect { |e| e.actor.name }           \
+        .uniq                                   \
+        .take(20)                         
+
+      # AFTER
+
+      active_sources_last_week = []
+      event_stream.each do |e|
+        name = e.actor.name
+        unless active_sources_last_week.member?(name)
+          active_sources_last_week << name
+        end
+        break if active_sources_last_week.size == 20
+      end
+
+  %p Blah. WTF!?
+    
 %section
 
   %h1 case in point
@@ -320,3 +327,64 @@ title: Enumerable, and the art of being lazy
       fib.<b>selecting</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]
 
   %p Tah-dah!
+
+%section
+
+  %h1 Enumerating
+
+  %pre
+    :preserve
+
+      gem "enumerating"
+
+  %p Adds a bunch of methods to Enumerable, including:
+
+  %ul
+    %li <code>selecting</code>
+    %li <code>rejecting</code>
+    %li <code>collecting</code>
+    %li <code>uniqing</code>
+    %li <code>taking</code>
+    %li <code>dropping</code>
+
+%section
+
+  %h1 another example
+  
+  %pre
+    :preserve
+
+      # enumerate all users
+      users = User.to_enum(:find_each)
+
+      # where first and last names start with the same letter
+      users = users.selecting do |u| 
+        u.first_name[0] == u.last_name[0]
+      end
+
+      # grab their company (weeding out duplicates)
+      companies = users.collecting(&:company).uniqing
+
+      # resolve
+      companies.to_a              #=> ["Disney"]
+
+  %p Oh yes, I like my pipes!
+
+%section
+
+  %h1 combining Enumerables
+  
+  %pre
+    :preserve
+
+      array1 = [1,3,6]
+      array2 = [2,4,7]
+
+      Enumerating.<b>zipping</b>(array1, array2).to_a
+      # => [[1,2], [3,4], [6,7]]
+
+      Enumerating.<b>concatenating</b>(array1, array2).to_a
+      # => [1,3,6,2,4,7]
+
+      Enumerating.<b>merging</b>(array1, array2).to_a
+      # => [1, 2, 3, 4, 6, 7]
