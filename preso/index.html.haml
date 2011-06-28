@@ -322,7 +322,7 @@ title: Enumerable, and the art of being lazy
   
       end
 
-      # fib.<strike>select</strike>(&:even?).take(5)
+      fib.select(&:even?).take(5)     # ... never returns
       
       fib.<b>selecting</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]
 
@@ -368,7 +368,7 @@ title: Enumerable, and the art of being lazy
       # resolve
       companies.to_a              #=> ["Disney"]
 
-  %p Oh yes, I like my pipes!
+  %p pipes FTW!
 
 %section
 
@@ -377,14 +377,51 @@ title: Enumerable, and the art of being lazy
   %pre
     :preserve
 
-      array1 = [1,3,6]
-      array2 = [2,4,7]
+      array1 = [1, 2, 5]
+      array2 = [3, 4, 6]
 
       Enumerating.<b>zipping</b>(array1, array2).to_a
-      # => [[1,2], [3,4], [6,7]]
+      # => [[1, 3], [2, 4], [5, 6]]
 
       Enumerating.<b>concatenating</b>(array1, array2).to_a
-      # => [1,3,6,2,4,7]
+      # => [1, 2, 5, 3, 4, 6]
 
       Enumerating.<b>merging</b>(array1, array2).to_a
-      # => [1, 2, 3, 4, 6, 7]
+      # => [1, 2, 3, 4, 5 ,6]
+
+%section
+
+  %h1 fancy schmancy
+
+  %pre
+    :preserve
+
+      array1 = %w(a dd cccc)
+      array2 = %w(eee bbbbb)
+
+      Enumerating.<b>merging_by</b>(array1, array2) do |x| 
+        x.<b>length</b>
+      end.to_a
+      # => %w(a dd eee cccc bbbbb)
+
+      array3 = %w(Apple Banana Acorn Candle Zebra Butternut)
+      array3.<b>uniqing_by</b> { |word| <b>word[0]</b> }.to_a
+      # => %w(Apple Banana Candle Zebra)
+
+%section
+
+  %h1 in summary
+
+  %pre
+    :preserve
+
+      gem install enumerating
+
+  %ul.big.sparse
+    %li= raw_link("https://github.com/mdub/enumerating")
+    %li= raw_link("http://twitter.com/woollyams")
+  
+  %p For even more laziness, see:
+
+  %ul.sparse
+    %li= raw_link("https://github.com/harukizaemon/hamster")

@@ -7,4 +7,8 @@ project.helpers do
     tokens.div :line_numbers => :inline, :css => :class
   end
   
+  def raw_link(url)
+    link(url, url)
+  end
+  
 end
