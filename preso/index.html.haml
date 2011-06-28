@@ -99,7 +99,7 @@ title: Enumerable, and the art of being lazy
 
 %section
 
-  %h1 Nice properties
+  %h1 some nice properties
   
   %ul.big
 
@@ -111,7 +111,7 @@ title: Enumerable, and the art of being lazy
 
 %section
 
-  %h1 Observation
+  %h1 observation:
 
   %p Some operations have to read <u>all</u> the input before producing output, e.g.
 
@@ -157,7 +157,7 @@ title: Enumerable, and the art of being lazy
       
 %section
 
-  %h1 Solution: unroll the loops
+  %h1 solution: unroll the loops
 
   %pre
     :preserve
@@ -227,13 +227,13 @@ title: Enumerable, and the art of being lazy
       
       fib.take(5)               # => [0, 1, 1, 2, 3]
 
-      fib.drop(5)               # ... a long wait
+      fib.drop(3).take(2)       # ... a long wait
 
-      fib.select(&:even?)       # ...
+      fib.select(&:even?)       # ... nada
 
       fib.collect do |x| 
         x * 2
-      end                       # ...
+      end                       # ... S.O.L.
 
 %section
 
@@ -259,7 +259,7 @@ title: Enumerable, and the art of being lazy
 
 %section
 
-  %h1 More functional
+  %h1 getting more functional
 
   %pre
     :preserve
@@ -278,7 +278,7 @@ title: Enumerable, and the art of being lazy
     
 %section
 
-  %h1 Decorative Enumerables
+  %h1 decorative Enumerables
 
   %pre
     :preserve
@@ -302,7 +302,7 @@ title: Enumerable, and the art of being lazy
 
 %section
 
-  %h1 Sugared decorations
+  %h1 decorative sugar
 
   %pre
     :preserve
@@ -319,4 +319,4 @@ title: Enumerable, and the art of being lazy
       
       fib.<b>selecting</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]
 
-      # ta-dah!
+  %p Tah-dah!
