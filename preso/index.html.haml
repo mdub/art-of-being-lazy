@@ -410,6 +410,32 @@ title: Enumerable, and the art of being lazy
 
 %section
 
+  %img(src="images/aggy.png")
+
+%section
+
+  %pre
+    :preserve
+
+      sources = [
+        Post.recent.authored_by_friends_of(@user),
+        Post.recent.on_interests_of(@user),
+        UserFollowing.recent.by_friends_of(@user),
+        TopicFollowing.recent.by_friends_of(@user)
+      ]
+
+      streams = sources.map do |scope| 
+        scope.to_enum(:find_each)       # ... ish (wave hands)
+      end
+      
+      merged_stream = Enumerating.merging_by(*streams, &:recency)
+
+      entries = merged_stream.take(23)
+
+      # with a bit of collecting and uniqing_by throw in ...
+      
+%section
+
   %h1 in summary
 
   %pre
