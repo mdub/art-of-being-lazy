@@ -8,7 +8,7 @@ project.helpers do
   end
   
   def raw_link(url)
-    link(url, url)
+    %{<a href="#{url}">#{url}</a>}
   end
   
 end
