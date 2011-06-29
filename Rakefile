@@ -25,6 +25,7 @@ namespace "github" do
     sh <<-BASH
       set -e 
       rm -fr #{tmpdir}; pith -i preso -o #{tmpdir} build
+      rm -fr #{tmpdir}/.sass-cache
       git checkout gh-pages && git pull origin gh-pages
       rm -r * && cp -r #{tmpdir}/* .
       git add -A .
