@@ -1,1 +1,145 @@
-Placeholder
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' />
+    <link href='slideshow/normalize.css' rel='stylesheet' />
+    <link href='slideshow/styles.css' rel='stylesheet' />
+    <title>Enumerable, and the art of being lazy</title>
+    <link href='custom-styles.css' rel='stylesheet' />
+  </head>
+  <body>
+    <article class='slideshow'>
+      <header>
+        <h1>Enumerable, and the art of being lazy</h1>
+        <nav>
+          <ul>
+            <li>
+              <button id='prev-btn' title='Previous slide'>Previous Slide</button>
+            </li>
+            <li><span id='slide-number'></span>/<span id='slide-total'></span></li>
+            <li>
+              <button id='next-btn' title='Next Slide'>Next Slide</button>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <section class='title'>
+            <h1>Enumerable, and the art of being lazy</h1>
+            <p>Mike Williams, June 2011</p>
+          </section>
+          <section>
+            <h1>a simple Enumerable</h1>
+            <pre>class SomeNumbers&#x000A;&#x000A;  # declare one method&#x000A;  &#x000A;  def <b>each</b>&#x000A;    yield 0&#x000A;    yield 1&#x000A;    yield 1&#x000A;    yield 2&#x000A;    yield 3&#x000A;    yield 5&#x000A;    yield 8&#x000A;  end&#x000A;&#x000A;  # mix in a bunch more&#x000A;  &#x000A;  include <b>Enumerable</b>&#x000A;  &#x000A;end&#x000A;</pre>
+          </section>
+          <section>
+            <h1>woohoo free stuff!</h1>
+            <pre>numbers = SomeNumbers.new&#x000A;&#x000A;numbers.to_a              # => [0, 1, 1, 2, 3, 5, 8]&#x000A;&#x000A;numbers.take(5)           # => [0, 1, 1, 2, 3]&#x000A;numbers.drop(5)           # => [5, 8]&#x000A;&#x000A;numbers.max               # => 8&#x000A;&#x000A;numbers.collect do |x| &#x000A;  x * 2&#x000A;end                       # => [0, 2, 2, 4, 6, 10, 16]&#x000A;&#x000A;numbers.inject(&:+)       # => 20&#x000A;</pre>
+          </section>
+          <section>
+            <h1>cf. Unix pipes</h1>
+            <table class='center'>
+              <tr>
+                <th>Enumerable</th>
+                <th>Unix command</th>
+              </tr>
+              <tr>
+                <td>
+                  <code>select/find_all, reject, grep</code>
+                </td>
+                <td>
+                  <code>grep, grep -v</code>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>collect/map</code>
+                </td>
+                <td>
+                  <code>sed, awk, tr</code>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>sort, uniq</code>
+                </td>
+                <td>
+                  <code>sort, uniq</code>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code>take, drop</code>
+                </td>
+                <td>
+                  <code>head, tail</code>
+                </td>
+              </tr>
+            </table>
+            <pre>cat messages.log | awk '{print $1}' | sort -u | wc -l&#x000A;&#x000A;messages.collect { |line| line.split[0] }.uniq.size&#x000A;</pre>
+          </section>
+          <section>
+            <h1>some nice properties</h1>
+            <ul class='big sparse'>
+              <li>Small, simple operations</li>
+              <li>Pre-tested</li>
+              <li>Composable</li>
+            </ul>
+          </section>
+          <section>
+            <h1>observation:</h1>
+            <p>Some operations have to read <u>all</u> the input before producing output, e.g.</p>
+            <ul>
+              <li>
+                <code>min</code>
+              </li>
+              <li>
+                <code>max</code>
+              </li>
+              <li>
+                <code>sort</code>
+              </li>
+              <li>
+                <code>inject</code>
+              </li>
+            </ul>
+            <p>Some <u>could</u> start early, e.g.</p>
+            <ul>
+              <li>
+                <code>select</code>
+              </li>
+              <li>
+                <code>reject</code>
+              </li>
+              <li>
+                <code>collect</code>
+              </li>
+              <li>
+                <code>uniq</code>
+              </li>
+            </ul>
+            <p>(but they don't)</p>
+          </section>
+          <section>
+            <h1>an infinite Enumerable</h1>
+            <pre>class FibonacciSequence&#x000A;&#x000A;  def <b>each</b>&#x000A;    a = 0&#x000A;    b = 1&#x000A;    loop do&#x000A;      yield a&#x000A;      a, b = b, a+b&#x000A;    end&#x000A;  end&#x000A;&#x000A;  include <b>Enumerable</b>&#x000A;  &#x000A;end&#x000A;&#x000A;irb> FibonacciSequence.new.each { |n| puts n }&#x000A;0&#x000A;1&#x000A;1&#x000A;2&#x000A;3&#x000A;5&#x000A;8&#x000A;13&#x000A;21&#x000A;...&#x000A;</pre>
+          </section>
+          <section>
+            <h1>"infinite" problems</h1>
+            <pre>&#x000A;fib = FibonacciSequence.new&#x000A;&#x000A;fib.take(5)               # => [0, 1, 1, 2, 3]&#x000A;&#x000A;fib.drop(3).take(2)       # ... a long wait&#x000A;&#x000A;fib.select(&:even?)       # ... nada&#x000A;&#x000A;fib.collect do |x| &#x000A;  x * 2&#x000A;end                       # ... S.O.L.&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;# an ActiveRecord example&#x000A;&#x000A;scope = Events.where("happened_at < ?", 1.week.ago)&#x000A;&#x000A;event_stream = scope.<b>to_enum</b>(:find_each)&#x000A;&#x000A;active_sources_last_week = event_stream   \&#x000A;  .collect { |e| e.actor.name }           \&#x000A;  .uniq                                   \&#x000A;  .take(20)                         &#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;# BEFORE&#x000A;&#x000A;active_sources_last_week = event_stream   \&#x000A;  .collect { |e| e.actor.name }           \&#x000A;  .uniq                                   \&#x000A;  .take(20)                         &#x000A;&#x000A;# AFTER&#x000A;&#x000A;active_sources_last_week = []&#x000A;event_stream.each do |e|&#x000A;  name = e.actor.name&#x000A;  unless active_sources_last_week.member?(name)&#x000A;    active_sources_last_week << name&#x000A;  end&#x000A;  break if active_sources_last_week.size == 20&#x000A;end&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;# get the first five <u>even</u> Fibonacci numbers&#x000A;&#x000A;fib.select(&:even?).take(5)   # ... never returns&#x000A;&#x000A;# unrolled&#x000A;&#x000A;result = []&#x000A;&#x000A;fib.each do |n|&#x000A;  result << n if n.even?&#x000A;  break if result.size == 5&#x000A;end&#x000A;&#x000A;result                        # => [0, 2, 8, 34, 144]&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;# original&#x000A;&#x000A;fib.select(&:even?).take(5)&#x000A;&#x000A;# functional&#x000A;&#x000A;take(select(fib, &:even?), 5)&#x000A;&#x000A;# decorative&#x000A;&#x000A;Taker.new(Selector.new(fib, &:even?), 5)&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;class <b>Selector</b>&#x000A;&#x000A;  def initialize(source, &predicate)&#x000A;    @source = source&#x000A;    @predicate = predicate&#x000A;  end&#x000A;&#x000A;  def <b>each</b>&#x000A;    @source.each do |value|&#x000A;      yield value if @predicate.call(value)&#x000A;    end&#x000A;  end&#x000A;&#x000A;  include Enumerable&#x000A;&#x000A;end&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;module Enumerable&#x000A;&#x000A;  def <b>selecting</b>(&predicate)&#x000A;    Selector.new(self, &predicate)&#x000A;  end&#x000A;&#x000A;end&#x000A;&#x000A;fib.select(&:even?).take(5)     # ... never returns&#x000A;&#x000A;fib.<b>selecting</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;gem "enumerating"&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;# enumerate all users&#x000A;users = User.to_enum(:find_each)&#x000A;&#x000A;# where first and last names start with the same letter&#x000A;users = users.selecting do |u| &#x000A;  u.first_name[0] == u.last_name[0]&#x000A;end&#x000A;&#x000A;# grab their company (weeding out duplicates)&#x000A;companies = users.collecting(&:company).uniqing&#x000A;&#x000A;# resolve&#x000A;companies.to_a              #=> ["Disney"]&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;array1 = [1, 2, 5]&#x000A;array2 = [3, 4, 6]&#x000A;&#x000A;Enumerating.<b>zipping</b>(array1, array2).to_a&#x000A;# => [[1, 3], [2, 4], [5, 6]]&#x000A;&#x000A;Enumerating.<b>concatenating</b>(array1, array2).to_a&#x000A;# => [1, 2, 5, 3, 4, 6]&#x000A;&#x000A;Enumerating.<b>merging</b>(array1, array2).to_a&#x000A;# => [1, 2, 3, 4, 5 ,6]&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;array1 = %w(a dd cccc)&#x000A;array2 = %w(eee bbbbb)&#x000A;&#x000A;Enumerating.<b>merging_by</b>(array1, array2) do |x| &#x000A;  x.<b>length</b>&#x000A;end.to_a&#x000A;# => %w(a dd eee cccc bbbbb)&#x000A;&#x000A;array3 = %w(Apple Banana Acorn Candle Zebra Butternut)&#x000A;array3.<b>uniqing_by</b> { |word| <b>word[0]</b> }.to_a&#x000A;# => %w(Apple Banana Candle Zebra)&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;sources = [&#x000A;  Post.recent.authored_by_friends_of(@user),&#x000A;  Post.recent.on_interests_of(@user),&#x000A;  UserFollowing.recent.by_friends_of(@user),&#x000A;  TopicFollowing.recent.by_friends_of(@user)&#x000A;]&#x000A;&#x000A;streams = sources.map do |scope| &#x000A;  scope.to_enum(:find_each)       # ... ish (wave hands)&#x000A;end&#x000A;&#x000A;merged_stream = Enumerating.merging_by(*streams, &:recency)&#x000A;&#x000A;entries = merged_stream.take(23)&#x000A;&#x000A;# with a bit of collecting and uniqing_by throw in ...&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;gem install enumerating&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;</pre>
+          </section>
+    </article>
+    <script src='slideshow/jquery-1.5.2.min.js'></script>
+    <script src='slideshow/htmlSlides.js'></script>
+    <script type='text/javascript'>
+      //<![CDATA[
+        //Do our business when the DOM is ready for us
+        $(function() {
+        
+          // One little option: hideToolbar (boolean; default = false)
+          htmlSlides.init({ hideToolbar: true });
+        
+        });
+      //]]>
+    </script>
+  </body>
+</html>

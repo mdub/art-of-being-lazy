@@ -1,0 +1,36 @@
+body {
+  font-family: 'Skia', Arial; }
+
+h1, h2, h3 {
+  font-family: 'Skia', Arial, sans-serif; }
+
+h1 {
+  font-size: 55px; }
+
+h2 {
+  font-size: 35px; }
+
+pre {
+  border: 1px solid #ccc;
+  background: #f6f6f0;
+  padding: 1em;
+  overflow: auto; }
+
+.centered {
+  text-align: center; }
+
+.center {
+  margin: 0 auto; }
+
+a:visited, a:link {
+  color: blue; }
+
+table th, table td {
+  border: 1px solid gray;
+  padding: 0.5em; }
+
+ul.sparse li {
+  margin: 0.8em 0; }
+
+.big {
+  font-size: 150%; }
