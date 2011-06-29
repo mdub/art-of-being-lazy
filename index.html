@@ -125,7 +125,84 @@
           </section>
           <section>
             <h1>"infinite" problems</h1>
-            <pre>&#x000A;fib = FibonacciSequence.new&#x000A;&#x000A;fib.take(5)               # => [0, 1, 1, 2, 3]&#x000A;&#x000A;fib.drop(3).take(2)       # ... a long wait&#x000A;&#x000A;fib.select(&:even?)       # ... nada&#x000A;&#x000A;fib.collect do |x| &#x000A;  x * 2&#x000A;end                       # ... S.O.L.&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;# an ActiveRecord example&#x000A;&#x000A;scope = Events.where("happened_at < ?", 1.week.ago)&#x000A;&#x000A;event_stream = scope.<b>to_enum</b>(:find_each)&#x000A;&#x000A;active_sources_last_week = event_stream   \&#x000A;  .collect { |e| e.actor.name }           \&#x000A;  .uniq                                   \&#x000A;  .take(20)                         &#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;# BEFORE&#x000A;&#x000A;active_sources_last_week = event_stream   \&#x000A;  .collect { |e| e.actor.name }           \&#x000A;  .uniq                                   \&#x000A;  .take(20)                         &#x000A;&#x000A;# AFTER&#x000A;&#x000A;active_sources_last_week = []&#x000A;event_stream.each do |e|&#x000A;  name = e.actor.name&#x000A;  unless active_sources_last_week.member?(name)&#x000A;    active_sources_last_week << name&#x000A;  end&#x000A;  break if active_sources_last_week.size == 20&#x000A;end&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;# get the first five <u>even</u> Fibonacci numbers&#x000A;&#x000A;fib.select(&:even?).take(5)   # ... never returns&#x000A;&#x000A;# unrolled&#x000A;&#x000A;result = []&#x000A;&#x000A;fib.each do |n|&#x000A;  result << n if n.even?&#x000A;  break if result.size == 5&#x000A;end&#x000A;&#x000A;result                        # => [0, 2, 8, 34, 144]&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;# original&#x000A;&#x000A;fib.select(&:even?).take(5)&#x000A;&#x000A;# functional&#x000A;&#x000A;take(select(fib, &:even?), 5)&#x000A;&#x000A;# decorative&#x000A;&#x000A;Taker.new(Selector.new(fib, &:even?), 5)&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;class <b>Selector</b>&#x000A;&#x000A;  def initialize(source, &predicate)&#x000A;    @source = source&#x000A;    @predicate = predicate&#x000A;  end&#x000A;&#x000A;  def <b>each</b>&#x000A;    @source.each do |value|&#x000A;      yield value if @predicate.call(value)&#x000A;    end&#x000A;  end&#x000A;&#x000A;  include Enumerable&#x000A;&#x000A;end&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;module Enumerable&#x000A;&#x000A;  def <b>selecting</b>(&predicate)&#x000A;    Selector.new(self, &predicate)&#x000A;  end&#x000A;&#x000A;end&#x000A;&#x000A;fib.select(&:even?).take(5)     # ... never returns&#x000A;&#x000A;fib.<b>selecting</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;gem "enumerating"&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;# enumerate all users&#x000A;users = User.to_enum(:find_each)&#x000A;&#x000A;# where first and last names start with the same letter&#x000A;users = users.selecting do |u| &#x000A;  u.first_name[0] == u.last_name[0]&#x000A;end&#x000A;&#x000A;# grab their company (weeding out duplicates)&#x000A;companies = users.collecting(&:company).uniqing&#x000A;&#x000A;# resolve&#x000A;companies.to_a              #=> ["Disney"]&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;array1 = [1, 2, 5]&#x000A;array2 = [3, 4, 6]&#x000A;&#x000A;Enumerating.<b>zipping</b>(array1, array2).to_a&#x000A;# => [[1, 3], [2, 4], [5, 6]]&#x000A;&#x000A;Enumerating.<b>concatenating</b>(array1, array2).to_a&#x000A;# => [1, 2, 5, 3, 4, 6]&#x000A;&#x000A;Enumerating.<b>merging</b>(array1, array2).to_a&#x000A;# => [1, 2, 3, 4, 5 ,6]&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;array1 = %w(a dd cccc)&#x000A;array2 = %w(eee bbbbb)&#x000A;&#x000A;Enumerating.<b>merging_by</b>(array1, array2) do |x| &#x000A;  x.<b>length</b>&#x000A;end.to_a&#x000A;# => %w(a dd eee cccc bbbbb)&#x000A;&#x000A;array3 = %w(Apple Banana Acorn Candle Zebra Butternut)&#x000A;array3.<b>uniqing_by</b> { |word| <b>word[0]</b> }.to_a&#x000A;# => %w(Apple Banana Candle Zebra)&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;sources = [&#x000A;  Post.recent.authored_by_friends_of(@user),&#x000A;  Post.recent.on_interests_of(@user),&#x000A;  UserFollowing.recent.by_friends_of(@user),&#x000A;  TopicFollowing.recent.by_friends_of(@user)&#x000A;]&#x000A;&#x000A;streams = sources.map do |scope| &#x000A;  scope.to_enum(:find_each)       # ... ish (wave hands)&#x000A;end&#x000A;&#x000A;merged_stream = Enumerating.merging_by(*streams, &:recency)&#x000A;&#x000A;entries = merged_stream.take(23)&#x000A;&#x000A;# with a bit of collecting and uniqing_by throw in ...&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;gem install enumerating&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;&#x000A;</pre>
+            <pre>fib = FibonacciSequence.new&#x000A;&#x000A;fib.take(5)               # => [0, 1, 1, 2, 3]&#x000A;&#x000A;fib.drop(3).take(2)       # ... a long wait&#x000A;&#x000A;fib.select(&:even?)       # ... nada&#x000A;&#x000A;fib.collect do |x| &#x000A;  x * 2&#x000A;end                       # ... S.O.L.&#x000A;</pre>
+          </section>
+          <section>
+            <h1>"big" problems</h1>
+            <pre># an ActiveRecord example&#x000A;&#x000A;scope = Events.where("happened_at < ?", 1.week.ago)&#x000A;&#x000A;event_stream = scope.<b>to_enum</b>(:find_each)&#x000A;&#x000A;active_sources_last_week = event_stream   \&#x000A;  .collect { |e| e.actor.name }           \&#x000A;  .uniq                                   \&#x000A;  .take(20)                         &#x000A;</pre>
+            <p>Problems:</p>
+            <ul class='sparse'>
+              <li>generates (using collect, and uniq) a bunch of objects that are never used</li>
+              <li>might require a lot of memory for temporary storage</li>
+            </ul>
+          </section>
+          <section>
+            <h1>solution: unroll the loops</h1>
+            <pre># BEFORE&#x000A;&#x000A;active_sources_last_week = event_stream   \&#x000A;  .collect { |e| e.actor.name }           \&#x000A;  .uniq                                   \&#x000A;  .take(20)                         &#x000A;&#x000A;# AFTER&#x000A;&#x000A;active_sources_last_week = []&#x000A;event_stream.each do |e|&#x000A;  name = e.actor.name&#x000A;  unless active_sources_last_week.member?(name)&#x000A;    active_sources_last_week << name&#x000A;  end&#x000A;  break if active_sources_last_week.size == 20&#x000A;end&#x000A;</pre>
+            <p>Blah. WTF!?</p>
+          </section>
+          <section>
+            <h1>case in point</h1>
+            <pre># get the first five <u>even</u> Fibonacci numbers&#x000A;&#x000A;fib.select(&:even?).take(5)   # ... never returns&#x000A;&#x000A;# unrolled&#x000A;&#x000A;result = []&#x000A;&#x000A;fib.each do |n|&#x000A;  result << n if n.even?&#x000A;  break if result.size == 5&#x000A;end&#x000A;&#x000A;result                        # => [0, 2, 8, 34, 144]&#x000A;</pre>
+          </section>
+          <section>
+            <h1>getting more functional</h1>
+            <pre># original&#x000A;&#x000A;fib.select(&:even?).take(5)&#x000A;&#x000A;# functional&#x000A;&#x000A;take(select(fib, &:even?), 5)&#x000A;&#x000A;# decorative&#x000A;&#x000A;Taker.new(Selector.new(fib, &:even?), 5)&#x000A;</pre>
+          </section>
+          <section>
+            <h1>decorative Enumerables</h1>
+            <pre>class <b>Selector</b>&#x000A;&#x000A;  def initialize(source, &predicate)&#x000A;    @source = source&#x000A;    @predicate = predicate&#x000A;  end&#x000A;&#x000A;  def <b>each</b>&#x000A;    @source.each do |value|&#x000A;      yield value if @predicate.call(value)&#x000A;    end&#x000A;  end&#x000A;&#x000A;  include <b>Enumerable</b>&#x000A;&#x000A;end&#x000A;</pre>
+          </section>
+          <section>
+            <h1>decorative sugar</h1>
+            <pre>module Enumerable&#x000A;&#x000A;  def <b>selecting</b>(&predicate)&#x000A;    Selector.new(self, &predicate)&#x000A;  end&#x000A;&#x000A;end&#x000A;&#x000A;fib.select(&:even?).take(5)     # ... never returns&#x000A;&#x000A;fib.<b>selecting</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]&#x000A;</pre>
+            <p>Tah-dah!</p>
+          </section>
+          <section>
+            <h1>Enumerating</h1>
+            <pre>gem "enumerating"&#x000A;</pre>
+            <p>Adds a bunch of methods to Enumerable, including:</p>
+            <ul>
+              <li><code>selecting</code></li>
+              <li><code>rejecting</code></li>
+              <li><code>collecting</code></li>
+              <li><code>uniqing</code></li>
+              <li><code>taking</code></li>
+              <li><code>dropping</code></li>
+            </ul>
+          </section>
+          <section>
+            <h1>another example</h1>
+            <pre># enumerate all users&#x000A;users = User.to_enum(:find_each)&#x000A;&#x000A;# where first and last names start with the same letter&#x000A;users = users.selecting do |u| &#x000A;  u.first_name[0] == u.last_name[0]&#x000A;end&#x000A;&#x000A;# grab their company (weeding out duplicates)&#x000A;companies = users.collecting(&:company).uniqing&#x000A;&#x000A;# resolve&#x000A;companies.to_a              #=> ["Disney"]&#x000A;</pre>
+            <p>pipes FTW!</p>
+          </section>
+          <section>
+            <h1>combining Enumerables</h1>
+            <pre>array1 = [1, 2, 5]&#x000A;array2 = [3, 4, 6]&#x000A;&#x000A;Enumerating.<b>zipping</b>(array1, array2).to_a&#x000A;# => [[1, 3], [2, 4], [5, 6]]&#x000A;&#x000A;Enumerating.<b>concatenating</b>(array1, array2).to_a&#x000A;# => [1, 2, 5, 3, 4, 6]&#x000A;&#x000A;Enumerating.<b>merging</b>(array1, array2).to_a&#x000A;# => [1, 2, 3, 4, 5 ,6]&#x000A;</pre>
+          </section>
+          <section>
+            <h1>fancy schmancy</h1>
+            <pre>array1 = %w(a dd cccc)&#x000A;array2 = %w(eee bbbbb)&#x000A;&#x000A;Enumerating.<b>merging_by</b>(array1, array2) do |word| &#x000A;  word.<b>length</b>&#x000A;end.to_a&#x000A;# => %w(a dd eee cccc bbbbb)&#x000A;&#x000A;array3 = %w(Apple Banana Acorn Candle Zebra Butternut)&#x000A;array3.<b>uniqing_by</b> do |word| &#x000A;  word<b>[0]</b>&#x000A;end.to_a&#x000A;# => %w(Apple Banana Candle Zebra)&#x000A;</pre>
+          </section>
+          <section>
+            <img src='images/aggy.png' />
+          </section>
+          <section>
+            <h1>don't cross the streams!</h1>
+            <pre>sources = [&#x000A;  Post.recent.authored_by_friends_of(@user),&#x000A;  Post.recent.on_interests_of(@user),&#x000A;  UserFollowing.recent.by_friends_of(@user),&#x000A;  TopicFollowing.recent.by_friends_of(@user)&#x000A;]&#x000A;&#x000A;streams = sources.map do |scope| &#x000A;  scope.to_enum(:find_each)       # ... ish (wave hands)&#x000A;end&#x000A;&#x000A;merged_stream = Enumerating.merging_by(*streams, &:recency)&#x000A;&#x000A;entries = merged_stream.take(23)&#x000A;&#x000A;# with a bit of collecting and uniqing_by throw in ...&#x000A;</pre>
+          </section>
+          <section>
+            <h1>in summary</h1>
+            <pre>gem install enumerating&#x000A;</pre>
+            <ul class='big sparse'>
+              <li><a href="https://github.com/mdub/enumerating">https://github.com/mdub/enumerating</a></li>
+              <li><a href="http://twitter.com/woollyams">http://twitter.com/woollyams</a></li>
+              <li><a href="http://www.cogentconsulting.com.au/">http://www.cogentconsulting.com.au/</a></li>
+            </ul>
+            <p>For even more laziness, see:</p>
+            <ul class='sparse'>
+              <li><a href="https://github.com/harukizaemon/hamster">https://github.com/harukizaemon/hamster</a></li>
+            </ul>
           </section>
     </article>
     <script src='slideshow/jquery-1.5.2.min.js'></script>
