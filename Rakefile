@@ -15,6 +15,12 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   t.rspec_opts = ["--colour", "--format", "nested"]
 end
 
+task "console" do
+  
+  sh("irb -I lib -r laziness")
+  
+end
+
 namespace "github" do
 
   desc "publish the site to GitHub Pages"
