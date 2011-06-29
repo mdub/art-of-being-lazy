@@ -15,6 +15,7 @@ GEM
       thin (~> 1.2.7)
       tilt (~> 1.1)
     rack (1.2.3)
+    rake (0.8.7)
     rspec (2.5.0)
       rspec-core (~> 2.5.0)
       rspec-expectations (~> 2.5.0)
@@ -35,4 +36,5 @@ PLATFORMS
 DEPENDENCIES
   enumerating
   pith
+  rake
   rspec
