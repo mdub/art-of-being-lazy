@@ -138,6 +138,7 @@ title: Enumerable, and the art of being lazy
       %code uniq
 
   %p (but they don't)
+
 %section
 
   %h1 an infinite Enumerable
@@ -178,9 +179,9 @@ title: Enumerable, and the art of being lazy
 
   %pre
     :preserve
-      
+
       fib = FibonacciSequence.new
-      
+
       fib.take(5)               # => [0, 1, 1, 2, 3]
 
       fib.drop(3).take(2)       # ... a long wait
@@ -190,7 +191,7 @@ title: Enumerable, and the art of being lazy
       fib.collect do |x| 
         x * 2
       end                       # ... S.O.L.
-  
+
 %section
 
   %h1 "big" problems
@@ -303,7 +304,7 @@ title: Enumerable, and the art of being lazy
           end
         end
   
-        include Enumerable
+        include <b>Enumerable</b>
   
       end
 
@@ -399,13 +400,15 @@ title: Enumerable, and the art of being lazy
       array1 = %w(a dd cccc)
       array2 = %w(eee bbbbb)
 
-      Enumerating.<b>merging_by</b>(array1, array2) do |x| 
-        x.<b>length</b>
+      Enumerating.<b>merging_by</b>(array1, array2) do |word| 
+        word.<b>length</b>
       end.to_a
       # => %w(a dd eee cccc bbbbb)
 
       array3 = %w(Apple Banana Acorn Candle Zebra Butternut)
-      array3.<b>uniqing_by</b> { |word| <b>word[0]</b> }.to_a
+      array3.<b>uniqing_by</b> do |word| 
+        word<b>[0]</b>
+      end.to_a
       # => %w(Apple Banana Candle Zebra)
 
 %section
