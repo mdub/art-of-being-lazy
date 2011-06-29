@@ -63,6 +63,33 @@ title: Enumerable, and the art of being lazy
 
 %section
 
+  %h1
+    \#to_enum 
+    (1.9)
+  
+  %h2 turn any iterator into an Enumerator
+
+  %pre
+    :preserve
+
+      io = StringIO.new("abcdefghijklmnopqrstuvwxyz")
+      
+      io.<b>each_char</b> { |c| puts c }   
+      # prints "a", "b", etc.
+      
+      io.<b>to_enum</b>(:each_char).take(5)
+      # => %w(a b c d e f g)
+
+  %pre
+    :preserve
+
+      array = %w(Juan Too Free)
+      
+      array.to_enum(:each_with_index).to_a
+      # => [["Juan", 0], ["Too", 1], ["Free", 2]]
+      
+%section
+
   %h1 cf. Unix pipes
 
   %table.center
@@ -71,7 +98,7 @@ title: Enumerable, and the art of being lazy
       %th Unix command
     %tr
       %td
-        %code select/find_all, reject, grep
+        %code select, reject, grep
       %td
         %code grep, grep -v
     %tr
@@ -99,21 +126,29 @@ title: Enumerable, and the art of being lazy
 
 %section
 
-  %h1 some nice properties
+  %h2 similar
   
   %ul.big.sparse
 
-    %li Small, simple operations
+    %li small, simple operations
 
-    %li Pre-tested
+    %li pre-tested
 
-    %li Composable
+    %li composable
+
+  %h2 but different
+
+  %ul.big.sparse
+      
+    %li not streamable
+
+    %li not parallelisable
 
 %section
 
   %h1 observation:
 
-  %p Some operations have to read <u>all</u> the input before producing output, e.g.
+  %p Some Enumerable operations have to read <u>all</u> the input before producing output, e.g.
 
   %ul
     %li
