@@ -187,7 +187,7 @@
           </section>
           <section>
             <h1>another example</h1>
-            <pre># enumerate all users&#x000A;users = User.to_enum(:find_each)&#x000A;&#x000A;# where first and last names start with the same letter&#x000A;users = users.selecting do |u| &#x000A;  u.first_name[0] == u.last_name[0]&#x000A;end&#x000A;&#x000A;# grab their company (weeding out duplicates)&#x000A;companies = users.collecting(&:company).uniqing&#x000A;&#x000A;# resolve&#x000A;companies.to_a              #=> ["Disney"]&#x000A;</pre>
+            <pre># enumerate all users&#x000A;users = User.to_enum(:find_each)&#x000A;&#x000A;# where first and last names start with the same letter&#x000A;users = users.selecting do |u| &#x000A;  u.first_name[0] == u.last_name[0]&#x000A;end&#x000A;&#x000A;# grab their company (weeding out duplicates)&#x000A;companies = users.collecting(&:company).uniqing&#x000A;&#x000A;# resolve&#x000A;companies.first              #=> "Disney"&#x000A;</pre>
             <p>pipes FTW!</p>
           </section>
           <section>
@@ -203,7 +203,7 @@
           </section>
           <section>
             <h1>don't cross the streams!</h1>
-            <pre>sources = [&#x000A;  Post.recent.authored_by_friends_of(@user),&#x000A;  Post.recent.on_interests_of(@user),&#x000A;  UserFollowing.recent.by_friends_of(@user),&#x000A;  TopicFollowing.recent.by_friends_of(@user)&#x000A;]&#x000A;&#x000A;streams = sources.map do |scope| &#x000A;  scope.to_enum(:find_each)       # ... ish (wave hands)&#x000A;end&#x000A;&#x000A;merged_stream = Enumerating.merging_by(*streams, &:recency)&#x000A;&#x000A;entries = merged_stream.take(23)&#x000A;&#x000A;# with a bit of collecting and uniqing_by throw in ...&#x000A;</pre>
+            <pre>sources = [&#x000A;  Post.recent.authored_by_friends_of(@user),&#x000A;  Post.recent.on_interests_of(@user),&#x000A;  UserFollowing.recent.by_friends_of(@user),&#x000A;  TopicFollowing.recent.by_friends_of(@user)&#x000A;]&#x000A;&#x000A;streams = sources.map do |scope| &#x000A;  scope.to_enum(:find_each).uniqing     # (sort of)&#x000A;end&#x000A;&#x000A;merged_stream = Enumerating.merging_by(*streams, &:recency)&#x000A;&#x000A;entries = merged_stream.take(23)&#x000A;&#x000A;# with a bit of collecting and uniqing_by throw in ...&#x000A;</pre>
           </section>
           <section>
             <h1>in summary</h1>
