@@ -36,6 +36,15 @@
             <pre>numbers = SomeNumbers.new&#x000A;&#x000A;numbers.to_a              # => [0, 1, 1, 2, 3, 5, 8]&#x000A;&#x000A;numbers.take(5)           # => [0, 1, 1, 2, 3]&#x000A;numbers.drop(5)           # => [5, 8]&#x000A;&#x000A;numbers.max               # => 8&#x000A;&#x000A;numbers.collect do |x| &#x000A;  x * 2&#x000A;end                       # => [0, 2, 2, 4, 6, 10, 16]&#x000A;&#x000A;numbers.inject(&:+)       # => 20&#x000A;</pre>
           </section>
           <section>
+            <h1>
+              #to_enum
+              (1.9)
+            </h1>
+            <h2>turn any iterator into an Enumerator</h2>
+            <pre>io = StringIO.new("abcdefghijklmnopqrstuvwxyz")&#x000A;&#x000A;io.<b>each_char</b> { |c| puts c }   &#x000A;# prints "a", "b", etc.&#x000A;&#x000A;io.<b>to_enum</b>(:each_char).take(5)&#x000A;# => %w(a b c d e f g)&#x000A;</pre>
+            <pre>array = %w(Juan Too Free)&#x000A;&#x000A;array.to_enum(:each_with_index).to_a&#x000A;# => [["Juan", 0], ["Too", 1], ["Free", 2]]&#x000A;</pre>
+          </section>
+          <section>
             <h1>cf. Unix pipes</h1>
             <table class='center'>
               <tr>
@@ -44,7 +53,7 @@
               </tr>
               <tr>
                 <td>
-                  <code>select/find_all, reject, grep</code>
+                  <code>select, reject, grep</code>
                 </td>
                 <td>
                   <code>grep, grep -v</code>
@@ -78,16 +87,21 @@
             <pre>cat messages.log | awk '{print $1}' | sort -u | wc -l&#x000A;&#x000A;messages.collect { |line| line.split[0] }.uniq.size&#x000A;</pre>
           </section>
           <section>
-            <h1>some nice properties</h1>
+            <h2>similar</h2>
             <ul class='big sparse'>
-              <li>Small, simple operations</li>
-              <li>Pre-tested</li>
-              <li>Composable</li>
+              <li>small, simple operations</li>
+              <li>pre-tested</li>
+              <li>composable</li>
+            </ul>
+            <h2>but different</h2>
+            <ul class='big sparse'>
+              <li>not streamable</li>
+              <li>not parallelisable</li>
             </ul>
           </section>
           <section>
             <h1>observation:</h1>
-            <p>Some operations have to read <u>all</u> the input before producing output, e.g.</p>
+            <p>Some Enumerable operations have to read <u>all</u> the input before producing output, e.g.</p>
             <ul>
               <li>
                 <code>min</code>
