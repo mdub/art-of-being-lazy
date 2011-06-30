@@ -402,7 +402,7 @@ title: Enumerable, and the art of being lazy
       companies = users.collecting(&:company).uniqing
 
       # resolve
-      companies.to_a              #=> ["Disney"]
+      companies.first              #=> "Disney"
 
   %p pipes FTW!
 
@@ -465,7 +465,7 @@ title: Enumerable, and the art of being lazy
       ]
 
       streams = sources.map do |scope| 
-        scope.to_enum(:find_each)       # ... ish (wave hands)
+        scope.to_enum(:find_each).uniqing     # (sort of)
       end
       
       merged_stream = Enumerating.merging_by(*streams, &:recency)
