@@ -1,10 +1,15 @@
-task "default" => ["open", "serve"]
+task "default" => ["build", "open"]
 
-task "open" do
-  sh "(sleep 2; open http://localhost:4321) &"
+task "build" do
+  sh "pith -i preso build"
 end
 
-task "serve" do
+task "open" do
+  sh "open preso/_out/index.html"
+end
+
+task "dev" do
+  sh "(sleep 2; open http://localhost:4321) &"
   sh "pith -i preso serve"
 end
 
