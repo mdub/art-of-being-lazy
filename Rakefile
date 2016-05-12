@@ -21,20 +21,20 @@ RSpec::Core::RakeTask.new(:spec) do |t|
 end
 
 task "console" do
-  
-  sh("irb -I lib -r laziness")
-  
+
+  sh("pry -I lib -r laziness")
+
 end
 
 namespace "github" do
 
   desc "publish the site to GitHub Pages"
   task "publish" => ["update", "push"]
-  
+
   task "update" do
     tmpdir = "/tmp/art-of-being-lazy"
     sh <<-BASH
-      set -e 
+      set -e
       rm -fr #{tmpdir}; pith -i preso -o #{tmpdir} build
       rm -fr .sass-cache
       git checkout gh-pages && git pull origin gh-pages
@@ -44,9 +44,9 @@ namespace "github" do
       git checkout master
     BASH
   end
-  
+
   task "push" do
     sh "git push origin gh-pages:gh-pages"
   end
-  
+
 end

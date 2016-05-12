@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     clamp (1.0.0)
+    coderay (1.1.1)
     daemons (1.2.3)
     diff-lcs (1.2.5)
     enumerating (1.2.1)
@@ -14,6 +15,7 @@ GEM
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
       rb-kqueue (>= 0.2)
+    method_source (0.8.2)
     pith (0.4.0)
       clamp (>= 0.3.0)
       listen (~> 1.2)
@@ -21,6 +23,10 @@ GEM
       rack-livejs (>= 0.2.1)
       thin (>= 1.2.7)
       tilt (~> 1.3)
+    pry (0.10.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
     rack (1.6.4)
     rack-livejs (0.2.1)
       rack
@@ -44,6 +50,7 @@ GEM
       rspec-support (~> 3.4.0)
     rspec-support (3.4.1)
     sass (3.4.22)
+    slop (3.6.0)
     thin (1.6.4)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
@@ -58,6 +65,7 @@ DEPENDENCIES
   haml
   lazily
   pith
+  pry
   rake
   rspec
   sass
