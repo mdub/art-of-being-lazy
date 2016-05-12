@@ -205,11 +205,18 @@
       </section>
       <section>
         <h2>lazy dequeue</h2>
-        <pre>q = Queue.new&#x000A;Thread.new do&#x000A;  q << 1&#x000A;  q << 2&#x000A;  q << 3&#x000A;  q << nil&#x000A;end&#x000A;&#x000A;Lazily.<b>dequeue</b>(q).take(2).to_a    # => [1,2]&#x000A;Lazily.dequeue(q).take(2).to_a    # => [3]&#x000A;</pre>
+        <pre>q = Queue.new&#x000A;Thread.new do&#x000A;  q << 1&#x000A;  q << 2&#x000A;  q << 3&#x000A;  q << nil    # acts as "terminator"&#x000A;end&#x000A;&#x000A;Lazily.<b>dequeue(q)</b>.each do |item|&#x000A;  do_something_with(item)&#x000A;end&#x000A;&#x000A;Lazily.dequeue(q).take(2).to_a    # => [1,2]&#x000A;Lazily.dequeue(q).take(2).to_a    # => [3]&#x000A;</pre>
       </section>
       <section>
         <h2>lazy threads</h2>
-        <pre>Benchmark.realtime do&#x000A;  fib.lazily.map { |x|&#x000A;    sleep 1; x * 2&#x000A;  }.take(100).to_a&#x000A;end                         #=> 100.14 seconds&#x000A;&#x000A;Benchmark.realtime do&#x000A;  fib.lazily.<b>in_threads(8)</b> { |x|&#x000A;    sleep 1; x * 2&#x000A;  }.take(100).to_a&#x000A;end                         #=> 13.02 seconds&#x000A;</pre>
+        <pre>slow_double = ->(x) { sleep 1; x * 2 }&#x000A;&#x000A;Benchmark.realtime do&#x000A;  fib.lazily.map(&slow_double).take(100).to_a&#x000A;end&#x000A;#=> 100.14 seconds&#x000A;&#x000A;Benchmark.realtime do&#x000A;  fib.lazily.<b>in_threads(8</b>, &slow_double).take(100).to_a&#x000A;end&#x000A;#=> 13.02 seconds&#x000A;</pre>
+      </section>
+      <section>
+        <h2>lazy threads involve some pre-work</h2>
+        <pre>inputs = (1 .. 100)&#x000A;outputs = inputs.lazily.in_threads(3) do |i|&#x000A;  i * i&#x000A;end&#x000A;outputs.take(5).to_a    #=> [1, 4, 9, 16, 25]&#x000A;</pre>
+        <p class='center-text'>
+          <img src='images/anticipation.png'>
+        </p>
       </section>
       <section>
         <h1>in summary</h1>
