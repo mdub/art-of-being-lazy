@@ -528,17 +528,33 @@ title: Enumerable, and the art of being lazy
   %pre
     :preserve
 
-      Benchmark.realtime do
-        fib.lazily.map { |x|
-          sleep 1; x * 2
-        }.take(100).to_a
-      end                         #=> 100.14 seconds
+      slow_double = ->(x) { sleep 1; x * 2 }
 
       Benchmark.realtime do
-        fib.lazily.<b>in_threads(8)</b> { |x|
-          sleep 1; x * 2
-        }.take(100).to_a
-      end                         #=> 13.02 seconds
+        fib.lazily.map(&slow_double).take(100).to_a
+      end
+      #=> 100.14 seconds
+
+      Benchmark.realtime do
+        fib.lazily.<b>in_threads(8</b>, &slow_double).take(100).to_a
+      end
+      #=> 13.02 seconds
+
+%section
+
+  %h2 lazy threads involve some pre-work
+
+  %pre
+    :preserve
+
+      inputs = (1 .. 100)
+      outputs = inputs.lazily.in_threads(3) do |i|
+        i * i
+      end
+      outputs.take(5).to_a    #=> [1, 4, 9, 16, 25]
+
+  %p.center-text
+    %img(src="images/anticipation.png")
 
 %section
 
