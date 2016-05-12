@@ -5,7 +5,6 @@ GEM
     coderay (1.1.1)
     daemons (1.2.3)
     diff-lcs (1.2.5)
-    enumerating (1.2.1)
     eventmachine (1.2.0.1)
     ffi (1.9.10)
     haml (4.0.7)
@@ -61,7 +60,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  enumerating
   haml
   lazily
   pith

@@ -22,7 +22,7 @@ end
 
 task "console" do
 
-  sh("pry -I lib -r laziness")
+  exec("pry -I lib -r laziness")
 
 end
 

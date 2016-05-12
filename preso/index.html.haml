@@ -279,10 +279,12 @@ title: Enumerable, and the art of being lazy
 
 %section
 
-  %h1 case in point
+  %h1 Fibonacci, unrolled
 
   %pre
     :preserve
+
+      fib = FibonacciSequence.new
 
       # get the first five <u>even</u> Fibonacci numbers
 
@@ -298,6 +300,24 @@ title: Enumerable, and the art of being lazy
       end
 
       result                        # => [0, 2, 8, 34, 144]
+
+%section
+
+  %h1 Fibonacci, lazy
+
+  %pre
+    :preserve
+
+      # get the first five <u>even</u> Fibonacci numbers
+
+      fib.select(&:even?).take(5)   # ... never returns
+
+      fib.<b>lazy</b>.select(&:even?).take(5).<b>to_a</b>
+                                    # => [0, 2, 8, 34, 144]
+
+      require 'lazily'
+      fib.<b>lazily</b>.select(&:even?).take(5).to_a
+                                    # => [0, 2, 8, 34, 144]
 
 %section
 
