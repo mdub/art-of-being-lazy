@@ -1,27 +1,27 @@
 /* Slider App Styles */
 section { padding: 0 30px 30px; display: none; }
 
-article > header { 
+article > header {
 
-  color: #000; 
+  color: #000;
   background: #ccc;
-  border-top: 1px solid #dcdcdc; 
-  border-bottom: 1px solid rgb(105, 105, 105); 
-  font-family: "Lucida Grande"; 
-  padding: 1px 10px; 
-  overflow: hidden; 
-  z-index: 10000; 
+  border-top: 1px solid #dcdcdc;
+  border-bottom: 1px solid rgb(105, 105, 105);
+  font-family: "Lucida Grande";
+  padding: 1px 10px;
+  overflow: hidden;
+  z-index: 10000;
   vertical-align: middle;
 
-  h1 { 
-    float: left; 
+  h1 {
+    float: left;
     font-weight: normal;
     font-size: 18px;
     line-height: 32px;
   }
 
-  nav { 
-    float: right; 
+  nav {
+    float: right;
     ul { margin: 0.5em; }
     li { float: left; line-height: 32px; font-size: 14px; }
     button { float: left; border: 0; width: 26px; height: 25px; text-indent: -9999px; display: block; cursor: pointer; margin-top:4px; }
@@ -29,22 +29,26 @@ article > header {
     #next-btn { background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAZCAYAAAAv3j5gAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAjdJREFUeNpi/PTpEwOxIDw8XBlIfV25cuULBhIBEymKFRUVPVhYWNYBLRSkqUUqKioSv3//tgQyj4WFhenRzCKgJb/+///P8O/fPw1GRsbDoaGhPjSxCGgBHP/584cPSG8ODg4uoLpFUN+g4/7AwMA5QMxCNYuAwfUfi0UgnAx0xB5/f39xXHpZfH19WUE0MRY5ODiwggzGAeyZmJhOAs0L2rx58zkMRwI19wM1hxNjETMzMw8wbngJ+Po70HeJW7duXYkinpqaev7atWsGDNQHtdu3b2+BBx3Qlax///6lgT0MzW5ubipAOnvXrl1fWWApiUYgHhiURi4uLrEssJRDKyApKaloZmamDLaIRkEHSqXfS0tLz/Hw8NxkAaYiRlr4KDY29ktaWtpCILMcVOKzcHFx/eTj4/tHZFnH8OXLF7yZnJ2d/X9JSclHb29vUIrrhSfvly9fNgNpf2IsOnDggFBjY6M0LnlxcfG/zc3NL/T09HKB3PUoJQMnJ2cTkG4lxqLLly9XAIO5Hpucjo7Or9bW1mvAyE8Eci9gFEGgEIFiguDHjx9/sMWnu7v79/r6+t1sbGxpQO5LrGUdiaU3RsLJzs7+lJycPB/ILMXnYFItguc5bm7u/w0NDR9cXV2rgdzphPSSZZGcnNyftra2p8BIBwXVLmL0kmQRMI7YdXV1f02cOPGciIhIKlDoCrF6SbLI0tLymYaGxiGgJWFA7nuSKk1S2nWghhAQ/wHiB6SWFAABBgC+fxD2vIG/7gAAAABJRU5ErkJggg==) no-repeat; margin-left:9px; }
 
   }
-  
+
 }
 
 .slide-selected { display: block; }
 .action, .action-on  { display: none; }
 
+.center-text { text-align: center; }
+
+.gap-before { margin-top: 90px; }
+
 .slide {
- 
+
   font-size: 20px;
-  
+
   h1 {
     margin: 0.2em 0 0.4em 0;
   }
-  
-  img, video, canvas, figure, object, embed { 
-    margin: 0 auto; 
+
+  img, video, canvas, figure, object, embed {
+    margin: 0 auto;
   }
-  
+
 }
