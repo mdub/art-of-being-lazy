@@ -408,11 +408,16 @@ title: Enumerable, and the art of being lazy
           Selector.new(self, &predicate)
         end
 
+        def <b>lazy_take</b>(n)
+          Taker.new(self, n)
+        end
+
       end
 
-      fib.select(&:even?).take(5)       # ... never returns
+      fib.select(&:even?).take(5)     # ... never returns
 
-      fib.<b>lazy_select</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]
+      fib.<b>lazy_select</b>(&:even?).<b>lazy_take</b>(5)
+                                      # => [0, 2, 8, 34, 144]
 
   %p Tah-dah!
 
@@ -425,38 +430,19 @@ title: Enumerable, and the art of being lazy
 
       gem "lazily"
 
-  %p Adds a bunch of methods to Enumerable, including:
-
-  %ul
-    %li <code>x.lazily.select</code>
-    %li <code>x.lazily.reject</code>
-    %li <code>x.lazily.collect</code>
-    %li <code>x.lazily.uniq</code>
-    %li <code>x.lazily.take</code>
-    %li <code>x.lazily.drop</code>
-
-%section
-
-  %h1 another example
+  %p It applies layers of decorative laziness, e.g.
 
   %pre
     :preserve
 
-      # enumerate all users
-      users = User.to_enum(:find_each)
+      fib.lazily.select(&:even?).take(5)
 
-      # where first and last names start with the same letter
-      users = users.selecting do |u|
-        u.first_name[0] == u.last_name[0]
-      end
+      #=> #&lt;Lazily::Filter: take
+            #&lt;Lazily::Filter: select
+              #&lt;Lazily::Proxy:
+                #&lt;FibonacciSequence:0x007f8bc22ce868&gt;&gt;&gt;&gt;
 
-      # grab their company (weeding out duplicates)
-      companies = users.collecting(&:company).uniqing
-
-      # resolve
-      companies.first              #=> "Disney"
-
-  %p pipes FTW!
+  %h2 but wait, there's more!
 
 %section
 
@@ -465,50 +451,32 @@ title: Enumerable, and the art of being lazy
   %pre
     :preserve
 
-      array1 = [1, 2, 5]
-      array2 = [3, 4, 6]
+      numbers_a = [1, 2, 5]
+      numbers_b = [3, 4, 6]
 
-      Enumerating.<b>zipping</b>(array1, array2).to_a
+      Lazily.<b>zip</b>(numbers_a, numbers_b).to_a
       # => [[1, 3], [2, 4], [5, 6]]
 
-      Enumerating.<b>concatenating</b>(array1, array2).to_a
+      Lazily.<b>concat</b>(numbers_a, numbers_b).to_a
       # => [1, 2, 5, 3, 4, 6]
 
-      Enumerating.<b>merging</b>(array1, array2).to_a
+      Lazily.<b>merge</b>(numbers_a, numbers_b).to_a
       # => [1, 2, 3, 4, 5 ,6]
 
-%section
+      words_1 = %w(a dd cccc)
+      words_2 = %w(eee bbbbb)
 
-  %h1 fancy schmancy
-
-  %pre
-    :preserve
-
-      array1 = %w(a dd cccc)
-      array2 = %w(eee bbbbb)
-
-      Enumerating.<b>merging_by</b>(array1, array2) do |word|
-        word.<b>length</b>
-      end.to_a
+      Lazily.<b>merge</b>(words_1, words_2, &:length).to_a
       # => %w(a dd eee cccc bbbbb)
 
-      array3 = %w(Apple Banana Acorn Candle Zebra Butternut)
-      array3.<b>uniqing_by</b> do |word|
-        word<b>[0]</b>
-      end.to_a
-      # => %w(Apple Banana Candle Zebra)
-
 %section
 
-  %img(src="images/aggy.png")
-
-%section
-
-  %h1 don't cross the streams!
+  %h1 combine big/infinite things
 
   %pre
     :preserve
 
+      <i># some source of content</i>
       sources = [
         Post.recent.authored_by_friends_of(@user),
         Post.recent.on_interests_of(@user),
@@ -516,15 +484,20 @@ title: Enumerable, and the art of being lazy
         TopicFollowing.recent.by_friends_of(@user)
       ]
 
-      streams = sources.map do |scope|
-        scope.to_enum(:find_each).uniqing     # (sort of)
+      <i># stream each, most recent first</i>
+      streams = sources.map do |source|
+        source.<b>to_enum(:find_each).lazily.uniq</b>
       end
 
-      merged_stream = Enumerating.merging_by(*streams, &:recency)
+      <i># merge into a single stream</i>
+      merged_stream = <b>Lazily.merge</b>(*streams, &:recency)
 
-      entries = merged_stream.take(23)
+      <i># grab a page's worth</i>
+      page = merged_stream.<b>take</b>(23)
 
-      # with a bit of collecting and uniqing_by throw in ...
+%section
+
+  %img(src="images/aggy.png")
 
 %section
 
