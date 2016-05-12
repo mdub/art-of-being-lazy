@@ -511,10 +511,14 @@ title: Enumerable, and the art of being lazy
         q << 1
         q << 2
         q << 3
-        q << nil
+        q << nil    # acts as "terminator"
       end
 
-      Lazily.<b>dequeue</b>(q).take(2).to_a    # => [1,2]
+      Lazily.<b>dequeue(q)</b>.each do |item|
+        do_something_with(item)
+      end
+
+      Lazily.dequeue(q).take(2).to_a    # => [1,2]
       Lazily.dequeue(q).take(2).to_a    # => [3]
 
 %section
