@@ -236,12 +236,11 @@ title: Enumerable, and the art of being lazy
 
       # an ActiveRecord example
 
-      scope = Events.where("happened_at < ?", 1.week.ago)
+      scope = Meetings.order_by("starts_at DESC")
+      meetings = scope.<b>to_enum</b>(:find_each)
 
-      event_stream = scope.<b>to_enum</b>(:find_each)
-
-      active_sources_last_week = event_stream   \
-        .collect { |e| e.actor.name }           \
+      recent_meeting_organisers = meetings      \
+        .collect { |e| e.organiser.name }       \
         .uniq                                   \
         .take(20)
 
@@ -260,20 +259,20 @@ title: Enumerable, and the art of being lazy
 
       # BEFORE
 
-      active_sources_last_week = event_stream   \
-        .collect { |e| e.actor.name }           \
+      recent_meeting_organisers = meetings      \
+        .collect { |e| e.organiser.name }       \
         .uniq                                   \
         .take(20)
 
       # AFTER
 
-      active_sources_last_week = []
-      event_stream.each do |e|
-        name = e.actor.name
-        unless active_sources_last_week.member?(name)
-          active_sources_last_week << name
+      recent_meeting_organisers = []
+      meetings.each do |e|
+        name = e.organiser.name
+        unless recent_meeting_organisers.member?(name)
+          recent_meeting_organisers << name
         end
-        break if active_sources_last_week.size == 20
+        break if recent_meeting_organisers.size == 20
       end
 
   %p Blah. WTF!?
