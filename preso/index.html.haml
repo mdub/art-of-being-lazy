@@ -501,6 +501,25 @@ title: Enumerable, and the art of being lazy
 
 %section
 
+  %h2 lazy threads
+
+  %pre
+    :preserve
+
+      Benchmark.realtime do
+        fib.lazily.map { |x|
+          sleep 1; x * 2
+        }.take(5).to_a            #=> [0, 2, 2, 4, 6]
+      end                         #=> 5 seconds
+
+      Benchmark.realtime do
+        fib.lazily.<b>in_threads(4)</b> { |x|
+          sleep 1; x * 2
+        }.take(5).to_a            #=> [0, 2, 2, 4, 6]
+      end                         #=> 2 seconds
+
+%section
+
   %h1 in summary
 
   %ul.big.sparse
