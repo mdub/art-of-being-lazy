@@ -29,20 +29,21 @@
       </section>
       <section>
         <h1>a simple Enumerable</h1>
-        <pre>class SomeNumbers&#x000A;&#x000A;  # declare one method&#x000A;&#x000A;  def <b>each</b>&#x000A;    yield 0&#x000A;    yield 1&#x000A;    yield 1&#x000A;    yield 2&#x000A;    yield 3&#x000A;    yield 5&#x000A;    yield 8&#x000A;  end&#x000A;&#x000A;  # mix in a bunch more&#x000A;&#x000A;  include <b>Enumerable</b>&#x000A;&#x000A;end&#x000A;</pre>
+        <pre>class SomeNumbers&#x000A;&#x000A;  # declare one method&#x000A;&#x000A;  def <b>each</b>&#x000A;    yield 1&#x000A;    yield 1&#x000A;    yield 2&#x000A;    yield 3&#x000A;    yield 5&#x000A;    yield 8&#x000A;    yield 13&#x000A;  end&#x000A;&#x000A;  # mix in a bunch more&#x000A;&#x000A;  include <b>Enumerable</b>&#x000A;&#x000A;end&#x000A;</pre>
       </section>
       <section>
         <h1>woohoo free stuff!</h1>
-        <pre>numbers = SomeNumbers.new&#x000A;&#x000A;numbers.to_a              # => [0, 1, 1, 2, 3, 5, 8]&#x000A;&#x000A;numbers.take(5)           # => [0, 1, 1, 2, 3]&#x000A;numbers.drop(5)           # => [5, 8]&#x000A;&#x000A;numbers.max               # => 8&#x000A;&#x000A;numbers.collect do |x|&#x000A;  x * 2&#x000A;end                       # => [0, 2, 2, 4, 6, 10, 16]&#x000A;&#x000A;numbers.inject(&:+)       # => 20&#x000A;</pre>
+        <pre>numbers = SomeNumbers.new&#x000A;&#x000A;numbers.to_a              # => [1, 1, 2, 3, 5, 8, 13]&#x000A;&#x000A;numbers.take(5)           # => [1, 1, 2, 3, 5]&#x000A;numbers.drop(5)           # => [8, 13]&#x000A;&#x000A;numbers.max               # => 13&#x000A;&#x000A;numbers.collect do |x|&#x000A;  x * 2&#x000A;end                       # => [2, 2, 4, 6, 10, 16, 26]&#x000A;&#x000A;numbers.inject(&:+)       # => 33&#x000A;</pre>
       </section>
       <section>
         <h1>
           #to_enum
-          (1.9)
+          (Ruby 1.9+)
         </h1>
         <h2>turn any iterator into an Enumerator</h2>
         <pre>io = StringIO.new("abcdefghijklmnopqrstuvwxyz")&#x000A;&#x000A;io.<b>each_char</b> { |c| puts c }&#x000A;# prints "a", "b", etc.&#x000A;&#x000A;io.<b>to_enum</b>(:each_char).take(5)&#x000A;# => %w(a b c d e f g)&#x000A;</pre>
-        <pre>array = %w(Juan Too Free)&#x000A;&#x000A;array.to_enum(:each_with_index).to_a&#x000A;# => [["Juan", 0], ["Too", 1], ["Free", 2]]&#x000A;</pre>
+        <h2>many iterators return Enumerators when called without a block</h2>
+        <pre>io.<b>each_char.take(5)</b>&#x000A;# => %w(a b c d e f g)&#x000A;&#x000A;array = %w(Juan Too Free)&#x000A;&#x000A;array.<b>each_with_index.to_a</b>&#x000A;# => [["Juan", 0], ["Too", 1], ["Free", 2]]&#x000A;</pre>
       </section>
       <section>
         <h1>cf. Unix pipes</h1>
@@ -135,11 +136,11 @@
       </section>
       <section>
         <h1>an infinite Enumerable</h1>
-        <pre>class FibonacciSequence&#x000A;&#x000A;  def <b>each</b>&#x000A;    a = 0&#x000A;    b = 1&#x000A;    loop do&#x000A;      yield a&#x000A;      a, b = b, a+b&#x000A;    end&#x000A;  end&#x000A;&#x000A;  include <b>Enumerable</b>&#x000A;&#x000A;end&#x000A;&#x000A;irb> FibonacciSequence.new.each { |n| puts n }&#x000A;0&#x000A;1&#x000A;1&#x000A;2&#x000A;3&#x000A;5&#x000A;8&#x000A;13&#x000A;21&#x000A;...&#x000A;</pre>
+        <pre>class FibonacciSequence&#x000A;&#x000A;  def <b>each</b>&#x000A;    a = b = 1&#x000A;    loop do&#x000A;      yield a&#x000A;      a, b = b, (a+b)&#x000A;    end&#x000A;  end&#x000A;&#x000A;  include <b>Enumerable</b>&#x000A;&#x000A;end&#x000A;&#x000A;irb> FibonacciSequence.new.each { |n| puts n }&#x000A;1&#x000A;1&#x000A;2&#x000A;3&#x000A;5&#x000A;8&#x000A;13&#x000A;21&#x000A;34&#x000A;...&#x000A;</pre>
       </section>
       <section>
         <h1>"infinite" problems</h1>
-        <pre>fib = FibonacciSequence.new&#x000A;&#x000A;fib.take(5)               # => [0, 1, 1, 2, 3]&#x000A;&#x000A;fib.drop(3).take(2)       # ... a long wait&#x000A;&#x000A;fib.select(&:even?)       # ... nada&#x000A;&#x000A;fib.collect do |x|&#x000A;  x * 2&#x000A;end                       # ... S.O.L.&#x000A;</pre>
+        <pre>fib = FibonacciSequence.new&#x000A;&#x000A;fib.take(5)               # => [1, 1, 2, 3, 5]&#x000A;&#x000A;fib.drop(3).take(2)       # ... a long wait&#x000A;&#x000A;fib.select(&:even?)       # ... nada&#x000A;&#x000A;fib.collect do |x|&#x000A;  x * 2&#x000A;end                       # ... S.O.L.&#x000A;</pre>
       </section>
       <section>
         <h1>"big" problems</h1>
@@ -157,11 +158,11 @@
       </section>
       <section>
         <h1>Fibonacci, unrolled</h1>
-        <pre>fib = FibonacciSequence.new&#x000A;&#x000A;# get the first five <u>even</u> Fibonacci numbers&#x000A;&#x000A;fib.select(&:even?).take(5)   # ... never returns&#x000A;&#x000A;# unrolled&#x000A;&#x000A;result = []&#x000A;&#x000A;fib.each do |n|&#x000A;  result << n if n.even?&#x000A;  break if result.size == 5&#x000A;end&#x000A;&#x000A;result                        # => [0, 2, 8, 34, 144]&#x000A;</pre>
+        <pre>fib = FibonacciSequence.new&#x000A;&#x000A;# get the first five <u>even</u> Fibonacci numbers&#x000A;&#x000A;fib.select(&:even?).take(5)   # ... never returns&#x000A;&#x000A;# unrolled&#x000A;&#x000A;result = []&#x000A;&#x000A;fib.each do |n|&#x000A;  result << n if n.even?&#x000A;  break if result.size == 5&#x000A;end&#x000A;&#x000A;result                        # => [2, 8, 34, 144, 610]&#x000A;</pre>
       </section>
       <section>
         <h1>Fibonacci, lazy</h1>
-        <pre># get the first five <u>even</u> Fibonacci numbers&#x000A;&#x000A;fib.select(&:even?).take(5)   # ... never returns&#x000A;&#x000A;fib.<b>lazy</b>.select(&:even?).take(5).<b>to_a</b>&#x000A;                              # => [0, 2, 8, 34, 144]&#x000A;&#x000A;require 'lazily'&#x000A;&#x000A;fib.<b>lazily</b>.select(&:even?).take(5).to_a&#x000A;                              # => [0, 2, 8, 34, 144]&#x000A;</pre>
+        <pre># get the first five <u>even</u> Fibonacci numbers&#x000A;&#x000A;fib.select(&:even?).take(5)   # ... never returns&#x000A;&#x000A;fib.<b>lazy</b>.select(&:even?).take(5).<b>to_a</b>&#x000A;                              # => [2, 8, 34, 144, 610]&#x000A;&#x000A;require 'lazily'&#x000A;&#x000A;fib.<b>lazily</b>.select(&:even?).take(5).to_a&#x000A;                              # => [2, 8, 34, 144, 610]&#x000A;</pre>
       </section>
       <section>
         <h1>breaking it down</h1>
@@ -182,7 +183,7 @@
       </section>
       <section>
         <h1>decorative sugar</h1>
-        <pre>module Enumerable&#x000A;&#x000A;  def <b>lazy_select</b>(&predicate)&#x000A;    Selector.new(self, &predicate)&#x000A;  end&#x000A;&#x000A;  def <b>lazy_take</b>(n)&#x000A;    Taker.new(self, n)&#x000A;  end&#x000A;&#x000A;end&#x000A;&#x000A;fib.select(&:even?).take(5)     # ... never returns&#x000A;&#x000A;fib.<b>lazy_select</b>(&:even?).<b>lazy_take</b>(5)&#x000A;                                # => [0, 2, 8, 34, 144]&#x000A;</pre>
+        <pre>module Enumerable&#x000A;&#x000A;  def <b>lazy_select</b>(&predicate)&#x000A;    Selector.new(self, &predicate)&#x000A;  end&#x000A;&#x000A;  def <b>lazy_take</b>(n)&#x000A;    Taker.new(self, n)&#x000A;  end&#x000A;&#x000A;end&#x000A;&#x000A;fib.select(&:even?).take(5)     # ... never returns&#x000A;&#x000A;fib.<b>lazy_select</b>(&:even?).<b>lazy_take</b>(5)&#x000A;                                # => [2, 8, 34, 144, 610]&#x000A;</pre>
         <p>Tah-dah!</p>
       </section>
       <section>
