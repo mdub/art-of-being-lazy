@@ -10,19 +10,19 @@ title: Enumerable, and the art of being lazy
 
   %h1 Enumerable, and the art of being lazy
 
-  %p Mike Williams, June 2011
-  
+  %p Mike Williams, <strike>June 2011</strike> May 2016
+
 %section
 
   %h1 a simple Enumerable
 
   %pre
     :preserve
-    
+
       class SomeNumbers
-  
+
         # declare one method
-        
+
         def <b>each</b>
           yield 0
           yield 1
@@ -34,9 +34,9 @@ title: Enumerable, and the art of being lazy
         end
 
         # mix in a bunch more
-        
+
         include <b>Enumerable</b>
-        
+
       end
 
 %section
@@ -55,7 +55,7 @@ title: Enumerable, and the art of being lazy
 
       numbers.max               # => 8
 
-      numbers.collect do |x| 
+      numbers.collect do |x|
         x * 2
       end                       # => [0, 2, 2, 4, 6, 10, 16]
 
@@ -64,19 +64,19 @@ title: Enumerable, and the art of being lazy
 %section
 
   %h1
-    \#to_enum 
+    \#to_enum
     (1.9)
-  
+
   %h2 turn any iterator into an Enumerator
 
   %pre
     :preserve
 
       io = StringIO.new("abcdefghijklmnopqrstuvwxyz")
-      
-      io.<b>each_char</b> { |c| puts c }   
+
+      io.<b>each_char</b> { |c| puts c }
       # prints "a", "b", etc.
-      
+
       io.<b>to_enum</b>(:each_char).take(5)
       # => %w(a b c d e f g)
 
@@ -84,10 +84,10 @@ title: Enumerable, and the art of being lazy
     :preserve
 
       array = %w(Juan Too Free)
-      
+
       array.to_enum(:each_with_index).to_a
       # => [["Juan", 0], ["Too", 1], ["Free", 2]]
-      
+
 %section
 
   %h1 cf. Unix pipes
@@ -127,7 +127,7 @@ title: Enumerable, and the art of being lazy
 %section
 
   %h2 similar
-  
+
   %ul.big.sparse
 
     %li small, simple operations
@@ -139,7 +139,7 @@ title: Enumerable, and the art of being lazy
   %h2 but different
 
   %ul.big.sparse
-      
+
     %li not streamable
 
     %li not parallelisable
@@ -180,9 +180,9 @@ title: Enumerable, and the art of being lazy
 
   %pre
     :preserve
-    
+
       class FibonacciSequence
-  
+
         def <b>each</b>
           a = 0
           b = 1
@@ -193,7 +193,7 @@ title: Enumerable, and the art of being lazy
         end
 
         include <b>Enumerable</b>
-        
+
       end
 
       irb> FibonacciSequence.new.each { |n| puts n }
@@ -223,7 +223,7 @@ title: Enumerable, and the art of being lazy
 
       fib.select(&:even?)       # ... nada
 
-      fib.collect do |x| 
+      fib.collect do |x|
         x * 2
       end                       # ... S.O.L.
 
@@ -239,18 +239,18 @@ title: Enumerable, and the art of being lazy
       scope = Events.where("happened_at < ?", 1.week.ago)
 
       event_stream = scope.<b>to_enum</b>(:find_each)
-    
+
       active_sources_last_week = event_stream   \
         .collect { |e| e.actor.name }           \
         .uniq                                   \
-        .take(20)                         
-      
+        .take(20)
+
   %p Problems:
-  
+
   %ul.sparse
     %li generates (using collect, and uniq) a bunch of objects that are never used
     %li might require a lot of memory for temporary storage
-  
+
 %section
 
   %h1 solution: unroll the loops
@@ -259,11 +259,11 @@ title: Enumerable, and the art of being lazy
     :preserve
 
       # BEFORE
-      
+
       active_sources_last_week = event_stream   \
         .collect { |e| e.actor.name }           \
         .uniq                                   \
-        .take(20)                         
+        .take(20)
 
       # AFTER
 
@@ -277,7 +277,7 @@ title: Enumerable, and the art of being lazy
       end
 
   %p Blah. WTF!?
-    
+
 %section
 
   %h1 case in point
@@ -290,14 +290,14 @@ title: Enumerable, and the art of being lazy
       fib.select(&:even?).take(5)   # ... never returns
 
       # unrolled
-      
+
       result = []
-      
+
       fib.each do |n|
         result << n if n.even?
         break if result.size == 5
       end
-      
+
       result                        # => [0, 2, 8, 34, 144]
 
 %section
@@ -308,17 +308,17 @@ title: Enumerable, and the art of being lazy
     :preserve
 
       # original
-      
+
       fib.select(&:even?).take(5)
-      
+
       # functional
-      
+
       take(select(fib, &:even?), 5)
 
       # decorative
-      
+
       Taker.new(Selector.new(fib, &:even?), 5)
-    
+
 %section
 
   %h1 decorative Enumerables
@@ -327,20 +327,20 @@ title: Enumerable, and the art of being lazy
     :preserve
 
       class <b>Selector</b>
-  
+
         def initialize(source, &predicate)
           @source = source
           @predicate = predicate
         end
-  
+
         def <b>each</b>
           @source.each do |value|
             yield value if @predicate.call(value)
           end
         end
-  
+
         include <b>Enumerable</b>
-  
+
       end
 
 %section
@@ -351,15 +351,15 @@ title: Enumerable, and the art of being lazy
     :preserve
 
       module Enumerable
-  
+
         def <b>selecting</b>(&predicate)
           Selector.new(self, &predicate)
         end
-  
+
       end
 
       fib.select(&:even?).take(5)     # ... never returns
-      
+
       fib.<b>selecting</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]
 
   %p Tah-dah!
@@ -386,7 +386,7 @@ title: Enumerable, and the art of being lazy
 %section
 
   %h1 another example
-  
+
   %pre
     :preserve
 
@@ -394,7 +394,7 @@ title: Enumerable, and the art of being lazy
       users = User.to_enum(:find_each)
 
       # where first and last names start with the same letter
-      users = users.selecting do |u| 
+      users = users.selecting do |u|
         u.first_name[0] == u.last_name[0]
       end
 
@@ -409,7 +409,7 @@ title: Enumerable, and the art of being lazy
 %section
 
   %h1 combining Enumerables
-  
+
   %pre
     :preserve
 
@@ -435,13 +435,13 @@ title: Enumerable, and the art of being lazy
       array1 = %w(a dd cccc)
       array2 = %w(eee bbbbb)
 
-      Enumerating.<b>merging_by</b>(array1, array2) do |word| 
+      Enumerating.<b>merging_by</b>(array1, array2) do |word|
         word.<b>length</b>
       end.to_a
       # => %w(a dd eee cccc bbbbb)
 
       array3 = %w(Apple Banana Acorn Candle Zebra Butternut)
-      array3.<b>uniqing_by</b> do |word| 
+      array3.<b>uniqing_by</b> do |word|
         word<b>[0]</b>
       end.to_a
       # => %w(Apple Banana Candle Zebra)
@@ -464,16 +464,16 @@ title: Enumerable, and the art of being lazy
         TopicFollowing.recent.by_friends_of(@user)
       ]
 
-      streams = sources.map do |scope| 
+      streams = sources.map do |scope|
         scope.to_enum(:find_each).uniqing     # (sort of)
       end
-      
+
       merged_stream = Enumerating.merging_by(*streams, &:recency)
 
       entries = merged_stream.take(23)
 
       # with a bit of collecting and uniqing_by throw in ...
-      
+
 %section
 
   %h1 in summary
@@ -487,7 +487,7 @@ title: Enumerable, and the art of being lazy
     %li= raw_link("https://github.com/mdub/enumerating")
     %li= raw_link("http://twitter.com/woollyams")
     %li= raw_link("http://www.cogentconsulting.com.au/")
-  
+
   %p For even more laziness, see:
 
   %ul.sparse

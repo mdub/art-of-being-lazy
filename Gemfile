@@ -1,6 +1,5 @@
 source "https://rubygems.org"
 
-gem "enumerating"
 gem "lazily"
 
 gem "rake"
