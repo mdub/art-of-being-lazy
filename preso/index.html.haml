@@ -316,51 +316,84 @@ title: Enumerable, and the art of being lazy
                                     # => [0, 2, 8, 34, 144]
 
       require 'lazily'
+
       fib.<b>lazily</b>.select(&:even?).take(5).to_a
                                     # => [0, 2, 8, 34, 144]
 
 %section
 
-  %h1 getting more functional
+  %h1 breaking it down
+
+  %h2 all sugary
 
   %pre
     :preserve
 
-      # original
+      fib.lazily.select(&:even?).take(5)
 
-      fib.select(&:even?).take(5)
+  %h2 functional
 
-      # functional
+  %pre
+    :preserve
 
       take(select(fib, &:even?), 5)
 
-      # decorative
+  %h2 decorative
+
+  %pre
+    :preserve
 
       Taker.new(Selector.new(fib, &:even?), 5)
 
 %section
 
-  %h1 decorative Enumerables
+  %h2 lazy "select"
 
   %pre
     :preserve
 
       class <b>Selector</b>
 
-        def initialize(source, &predicate)
+        def initialize(source, <b>&predicate</b>)
           @source = source
           @predicate = predicate
         end
 
-        def <b>each</b>
+        def each
           @source.each do |value|
-            yield value if @predicate.call(value)
+            <b>yield value if @predicate.call(value)</b>
           end
         end
 
-        include <b>Enumerable</b>
+        include Enumerable
 
       end
+
+%section
+
+  %h2 lazy "take"
+
+  %pre
+    :preserve
+
+      class <b>Taker</b>
+
+        def initialize(source, <b>n</b>)
+          @source = source
+          @n = n
+        end
+
+        def each
+          @source.each_with_index do |value, index|
+            <b>break if index >= @n
+            yield value</b>
+          end
+        end
+
+        include Enumerable
+
+      end
+
 
 %section
 
@@ -371,36 +404,36 @@ title: Enumerable, and the art of being lazy
 
       module Enumerable
 
-        def <b>selecting</b>(&predicate)
+        def <b>lazy_select</b>(&predicate)
           Selector.new(self, &predicate)
         end
 
       end
 
-      fib.select(&:even?).take(5)     # ... never returns
+      fib.select(&:even?).take(5)       # ... never returns
 
-      fib.<b>selecting</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]
+      fib.<b>lazy_select</b>(&:even?).take(5)  # => [0, 2, 8, 34, 144]
 
   %p Tah-dah!
 
 %section
 
-  %h1 Enumerating
+  %h1 Lazily
 
   %pre
     :preserve
 
-      gem "enumerating"
+      gem "lazily"
 
   %p Adds a bunch of methods to Enumerable, including:
 
   %ul
-    %li <code>selecting</code>
-    %li <code>rejecting</code>
-    %li <code>collecting</code>
-    %li <code>uniqing</code>
-    %li <code>taking</code>
-    %li <code>dropping</code>
+    %li <code>x.lazily.select</code>
+    %li <code>x.lazily.reject</code>
+    %li <code>x.lazily.collect</code>
+    %li <code>x.lazily.uniq</code>
+    %li <code>x.lazily.take</code>
+    %li <code>x.lazily.drop</code>
 
 %section
 
