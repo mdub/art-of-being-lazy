@@ -7,7 +7,7 @@ article > header {
   color: #000;
   background: #ccc;
   border-top: 1px solid #dcdcdc;
-  border-bottom: 1px solid #696969;
+  border-bottom: 1px solid dimgray;
   font-family: "Lucida Grande";
   padding: 1px 10px;
   overflow: hidden;
@@ -48,6 +48,12 @@ article > header {
 
 .action, .action-on {
   display: none; }
+
+.center-text {
+  text-align: center; }
+
+.gap-before {
+  margin-top: 90px; }
 
 .slide {
   font-size: 20px; }
