@@ -501,6 +501,24 @@ title: Enumerable, and the art of being lazy
 
 %section
 
+  %h2 lazy dequeue
+
+  %pre
+    :preserve
+
+      q = Queue.new
+      Thread.new do
+        q << 1
+        q << 2
+        q << 3
+        q << nil
+      end
+
+      Lazily.<b>dequeue</b>(q).take(2).to_a    # => [1,2]
+      Lazily.dequeue(q).take(2).to_a    # => [3]
+
+%section
+
   %h2 lazy threads
 
   %pre
